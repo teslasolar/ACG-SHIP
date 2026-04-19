@@ -1,0 +1,3351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Forensics — AI-Native Talent Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700;900&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #faf8f4;
+  --cream-2: #f4f1ea;
+  --paper: #ffffff;
+  --ink: #0f1d2e;
+  --ink-2: #1d2b3d;
+  --text: #2a3547;
+  --text-muted: #6b7280;
+  --rule: #e7e2d8;
+  --rule-2: #d8d2c5;
+  --accent: #1c4033;
+  --accent-light: #2d5a4a;
+  --accent-subtle: #e8efe9;
+  --gold: #a68a2d;
+  --shadow-sm: 0 1px 2px rgba(15, 29, 46, 0.04), 0 1px 4px rgba(15, 29, 46, 0.04);
+  --shadow-md: 0 4px 12px rgba(15, 29, 46, 0.06), 0 2px 4px rgba(15, 29, 46, 0.04);
+  --shadow-lg: 0 12px 32px rgba(15, 29, 46, 0.08), 0 4px 8px rgba(15, 29, 46, 0.04);
+  --serif: 'Playfair Display', Georgia, serif;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--cream);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 36px 40px 60px;
+}
+
+/* ============ HEADER ============ */
+header.site-header {
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 48px;
+}
+
+.brand-mark {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.brand-logo {
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid var(--ink);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-weight: 900;
+  font-size: 24px;
+  color: var(--ink);
+  letter-spacing: -0.05em;
+}
+
+.brand-name {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.brand-tagline {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.hero {
+  max-width: 820px;
+}
+
+.hero h1 {
+  font-family: var(--serif);
+  font-size: 52px;
+  line-height: 1.05;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 20px;
+  letter-spacing: -0.02em;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.hero p {
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--text);
+  max-width: 720px;
+  font-weight: 400;
+}
+
+.hero .intro-stats {
+  display: flex;
+  gap: 40px;
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid var(--rule);
+}
+
+.stat-block .stat-number {
+  font-family: var(--serif);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.stat-block .stat-label {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+/* ============ SECTION HEADS ============ */
+.section-head {
+  margin-bottom: 28px;
+}
+
+.section-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-family: var(--serif);
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+  margin-bottom: 10px;
+}
+
+.section-intro {
+  font-size: 16px;
+  color: var(--text);
+  max-width: 680px;
+  line-height: 1.6;
+}
+
+/* ============ CARDS ============ */
+.card {
+  background: var(--paper);
+  border-radius: 6px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--rule);
+  overflow: hidden;
+}
+
+.card-head {
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-head h3 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.card-head .card-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.card-body { padding: 28px; }
+
+/* ============ FORM ============ */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 720px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 36px; }
+  .section-title { font-size: 26px; }
+  .wrap { padding: 24px 20px 40px; }
+}
+
+label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--ink);
+  margin-bottom: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+input[type="text"], textarea, select {
+  width: 100%;
+  border: 1px solid var(--rule-2);
+  background: var(--paper);
+  padding: 11px 14px;
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--text);
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  font-weight: 400;
+}
+
+input[type="text"]:focus, textarea:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(28, 64, 51, 0.08);
+}
+
+textarea {
+  min-height: 200px;
+  resize: vertical;
+  line-height: 1.55;
+  font-family: var(--sans);
+}
+
+.helper-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  font-weight: 400;
+}
+
+.options-row {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 16px 0;
+  margin: 8px 0 20px;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.option-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+}
+
+.option-toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* ============ BUTTONS ============ */
+button {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 11px 22px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+  transition: all 0.15s;
+  border-radius: 4px;
+}
+
+button:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+button.secondary {
+  background: var(--paper);
+  color: var(--ink);
+  border-color: var(--rule-2);
+}
+
+button.secondary:hover:not(:disabled) {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+button.ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--rule-2);
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+button.ghost:hover:not(:disabled) {
+  background: var(--cream-2);
+  color: var(--ink);
+  border-color: var(--rule-2);
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+button.primary-cta {
+  padding: 13px 28px;
+  font-size: 15px;
+}
+
+/* ============ LOADING ============ */
+.loading {
+  display: none;
+  padding: 44px 28px;
+  text-align: center;
+  background: var(--cream-2);
+  border-radius: 6px;
+  margin-top: 20px;
+  border: 1px solid var(--rule);
+}
+
+.loading.show { display: block; }
+
+.loading-title {
+  font-family: var(--serif);
+  font-size: 20px;
+  color: var(--ink);
+  margin-bottom: 14px;
+  font-weight: 700;
+}
+
+.loading-stages {
+  display: inline-block;
+  text-align: left;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.loading-stages div {
+  padding: 5px 0;
+  opacity: 0.4;
+  transition: opacity 0.3s, color 0.3s;
+}
+
+.loading-stages div.active { opacity: 1; color: var(--accent); font-weight: 600; }
+.loading-stages div.done { opacity: 0.7; color: var(--ink); }
+.loading-stages div.done::before { content: '✓ '; color: var(--accent); font-weight: 600; }
+.loading-stages div.active::before { content: '→ '; color: var(--accent); font-weight: 600; }
+.loading-stages div:not(.active):not(.done)::before { content: '  '; }
+
+/* ============ REPORT ============ */
+.report {
+  display: none;
+  margin-top: 36px;
+}
+
+.report.show { display: block; }
+
+.report-header {
+  background: var(--paper);
+  border-radius: 6px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--rule);
+  padding: 32px 36px;
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .report-header { grid-template-columns: 1fr; }
+}
+
+.report-subject-name {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ink);
+  margin-bottom: 12px;
+  letter-spacing: -0.015em;
+}
+
+.report-subject-name .redacted { color: var(--text-muted); font-style: italic; font-weight: 400; font-size: 22px; }
+
+.report-meta {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+
+.report-meta .meta-item {
+  font-size: 12px;
+}
+
+.report-meta .meta-label {
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+  font-weight: 500;
+}
+
+.report-meta .meta-value {
+  color: var(--ink);
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.score-panel {
+  text-align: center;
+  padding: 0 0 0 28px;
+  border-left: 1px solid var(--rule);
+  min-width: 180px;
+}
+
+@media (max-width: 720px) {
+  .score-panel { border-left: none; padding-left: 0; border-top: 1px solid var(--rule); padding-top: 20px; }
+}
+
+.score-label {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.score-number {
+  font-family: var(--serif);
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.score-number .score-max {
+  font-size: 18px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.milestone-pill {
+  display: inline-block;
+  padding: 6px 14px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-top: 12px;
+}
+
+/* ============ SKILL BARS ============ */
+.skills-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 40px;
+}
+
+@media (max-width: 720px) { .skills-grid { grid-template-columns: 1fr; } }
+
+.skill-row {
+  display: grid;
+  grid-template-columns: 180px 1fr 40px;
+  gap: 16px;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.skill-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.skill-bar-bg {
+  height: 8px;
+  background: var(--cream-2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.skill-bar-fill {
+  height: 100%;
+  background: var(--ink);
+  transition: width 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border-radius: 4px;
+}
+
+.skill-bar-fill.high { background: var(--accent); }
+.skill-bar-fill.mid { background: var(--gold); }
+
+.skill-score {
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  font-size: 13px;
+}
+
+/* ============ ARCHETYPES ============ */
+.archetype-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.archetype-card {
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  padding: 18px 18px 14px;
+  background: var(--paper);
+  position: relative;
+  transition: border-color 0.15s;
+}
+
+.archetype-card.primary {
+  border: 2px solid var(--accent);
+  background: var(--accent-subtle);
+}
+
+.archetype-card.secondary {
+  border: 2px solid var(--gold);
+}
+
+.archetype-tag {
+  position: absolute;
+  top: -9px;
+  left: 14px;
+  background: var(--paper);
+  padding: 1px 10px;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 2px;
+}
+
+.archetype-card.primary .archetype-tag {
+  background: var(--accent);
+  color: var(--paper);
+}
+
+.archetype-card.secondary .archetype-tag {
+  background: var(--gold);
+  color: var(--paper);
+}
+
+.arch-name {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+
+.arch-fit {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  min-height: 36px;
+}
+
+.arch-match-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.arch-match {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.arch-match .arch-pct {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.arch-bar {
+  width: 80px;
+  height: 4px;
+  background: var(--cream-2);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-left: 10px;
+  flex: 1;
+}
+
+.arch-bar-fill {
+  height: 100%;
+  background: var(--text-muted);
+  border-radius: 2px;
+}
+
+.archetype-card.primary .arch-bar-fill { background: var(--accent); }
+.archetype-card.secondary .arch-bar-fill { background: var(--gold); }
+
+/* ============ FINDINGS ============ */
+.findings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+@media (max-width: 720px) { .findings { grid-template-columns: 1fr; } }
+
+.finding-col h4 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: var(--ink);
+}
+
+.finding-col ul { list-style: none; padding: 0; }
+
+.finding-col li {
+  padding: 10px 0 10px 22px;
+  font-size: 14px;
+  line-height: 1.55;
+  border-bottom: 1px solid var(--rule);
+  position: relative;
+  color: var(--text);
+}
+
+.finding-col li:last-child { border-bottom: none; }
+
+.finding-col.strengths li::before {
+  content: '+';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.finding-col.gaps li::before {
+  content: '−';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* ============ VERDICT ============ */
+.verdict-block {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 32px 36px;
+  border-radius: 6px;
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.55;
+  position: relative;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-md);
+}
+
+.verdict-label {
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.verdict-text b {
+  color: var(--gold);
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* ============ TRIAL ============ */
+.trial-recommendation {
+  background: var(--paper);
+  border-radius: 6px;
+  border: 1px solid var(--rule);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+}
+
+.trial-label {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.trial-hint {
+  font-family: var(--serif);
+  font-size: 18px;
+  color: var(--ink);
+  line-height: 1.5;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.trial-hint strong { font-weight: 700; }
+
+.trial-tiers {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+@media (max-width: 720px) {
+  .trial-tiers { grid-template-columns: repeat(2, 1fr); }
+}
+
+.tier {
+  padding: 18px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  background: var(--cream);
+  text-align: center;
+  transition: transform 0.15s;
+}
+
+.tier.match {
+  background: var(--accent-subtle);
+  border: 2px solid var(--accent);
+  box-shadow: var(--shadow-md);
+}
+
+.tier-name {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.tier.match .tier-name { color: var(--accent); }
+
+.tier-price {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.05em;
+}
+
+.tier.match .tier-price { color: var(--accent); }
+
+.tier-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+/* ============ SIGNALS / TAGS ============ */
+.signals-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.tag {
+  display: inline-block;
+  border: 1px solid var(--rule-2);
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--paper);
+  border-radius: 14px;
+  color: var(--text);
+}
+
+.tag.explicit { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.tag.inferred { border-style: dashed; color: var(--text-muted); }
+.tag.tool { background: var(--accent-subtle); color: var(--accent); border-color: var(--accent); }
+
+.signals-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 20px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule);
+  align-items: start;
+}
+
+.signals-row:last-child { border-bottom: none; }
+
+.signals-row .signals-label {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  padding-top: 4px;
+}
+
+/* ============ PROBES ============ */
+.probes-list {
+  counter-reset: probe;
+}
+
+.probe-item {
+  counter-increment: probe;
+  padding: 16px 20px 16px 64px;
+  background: var(--cream);
+  border-radius: 4px;
+  margin-bottom: 10px;
+  position: relative;
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+  font-style: italic;
+  border: 1px solid var(--rule);
+}
+
+.probe-item::before {
+  content: counter(probe, decimal-leading-zero);
+  position: absolute;
+  left: 18px;
+  top: 14px;
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+  font-style: normal;
+}
+
+/* ============ PRE-SCREEN PROBE ============ */
+.probe-panel {
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  background: var(--paper);
+}
+
+.probe-panel.generated {
+  border-color: var(--accent);
+  background: var(--paper);
+}
+
+.probe-empty {
+  padding: 40px 24px;
+  text-align: center;
+  background: var(--cream);
+  border-radius: 4px;
+}
+
+.probe-empty .probe-icon {
+  font-size: 28px;
+  color: var(--accent);
+  margin-bottom: 10px;
+  font-weight: 300;
+}
+
+.probe-empty .probe-title {
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.probe-empty .probe-desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.55;
+}
+
+.probe-content { padding: 24px 28px; }
+
+.probe-meta {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  background: var(--cream-2);
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 12px;
+}
+
+.probe-meta .probe-meta-item strong {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.probe-meta .probe-meta-item span {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.probe-section {
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.probe-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.probe-section h5 {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.probe-section .probe-text {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.probe-section ul { list-style: none; padding: 0; margin-top: 6px; }
+
+.probe-section ul li {
+  padding: 6px 0 6px 22px;
+  font-size: 13px;
+  line-height: 1.55;
+  position: relative;
+  color: var(--text);
+}
+
+.probe-section ul li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 13px;
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+.probe-section.red-flags ul li::before { background: var(--gold); }
+
+.probe-loading {
+  padding: 40px 24px;
+  text-align: center;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.probe-loading::after {
+  content: ' ⋯';
+  animation: pulse 1.2s infinite;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* ============ ERROR ============ */
+.error-block {
+  display: none;
+  padding: 16px 20px;
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+  margin-top: 16px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.error-block.show { display: block; }
+
+/* ============ MARKET ANALYSIS ============ */
+.market-section {
+  margin-top: 80px;
+  padding-top: 56px;
+  border-top: 1px solid var(--rule);
+}
+
+.market-paradox {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  margin: 40px 0 56px;
+  padding: 40px 44px;
+  background: var(--paper);
+  border-radius: 6px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--rule);
+  align-items: center;
+}
+
+@media (max-width: 760px) {
+  .market-paradox { grid-template-columns: 1fr; gap: 32px; padding: 28px; }
+}
+
+.paradox-side {
+  position: relative;
+}
+
+.paradox-label {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.paradox-side.contradiction .paradox-label { color: var(--gold); }
+
+.paradox-title {
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  margin-bottom: 14px;
+}
+
+.paradox-body {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.paradox-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--text-muted);
+  font-size: 20px;
+  font-weight: 400;
+  padding: 0;
+}
+
+@media (max-width: 760px) {
+  .paradox-divider { padding: 0; border-top: 1px solid var(--rule); padding-top: 20px; }
+}
+
+/* Stat callouts — the impact numbers */
+.stat-callouts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin: 40px 0;
+}
+
+@media (max-width: 900px) {
+  .stat-callouts { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .stat-callouts { grid-template-columns: 1fr; }
+}
+
+.stat-callout {
+  padding: 28px 22px;
+  background: var(--paper);
+  border-radius: 6px;
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-callout.gold { border-top-color: var(--gold); }
+.stat-callout.ink { border-top-color: var(--ink); }
+
+.stat-callout-num {
+  font-family: var(--serif);
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin-bottom: 6px;
+}
+
+.stat-callout-num .stat-unit {
+  font-size: 22px;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-left: 2px;
+}
+
+.stat-callout-label {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.stat-callout-source {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 500;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+/* Failure modes — the 4 structural problems */
+.failures-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin: 32px 0 48px;
+}
+
+@media (max-width: 760px) {
+  .failures-grid { grid-template-columns: 1fr; }
+}
+
+.failure-card {
+  background: var(--paper);
+  border-radius: 6px;
+  padding: 28px 30px;
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.failure-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 30px;
+  right: 30px;
+  height: 2px;
+  background: var(--accent);
+}
+
+.failure-num {
+  font-family: var(--serif);
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.failure-title {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  margin-bottom: 12px;
+}
+
+.failure-body {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.failure-data {
+  padding: 14px 16px;
+  background: var(--cream);
+  border-radius: 4px;
+  border-left: 3px solid var(--accent);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink);
+  margin-top: 14px;
+}
+
+.failure-data strong { color: var(--accent); font-weight: 700; }
+
+/* The translation failure diagram */
+.translation-diagram {
+  margin: 48px 0;
+  padding: 36px 32px;
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 6px;
+  text-align: center;
+}
+
+.translation-diagram h3 {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.015em;
+  color: var(--cream);
+}
+
+.translation-diagram .translation-sub {
+  font-size: 14px;
+  color: var(--cream);
+  opacity: 0.7;
+  margin-bottom: 32px;
+}
+
+.translation-chain {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.translation-step {
+  flex: 1;
+  min-width: 150px;
+  padding: 20px 14px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 4px;
+  margin: 4px;
+  text-align: left;
+  position: relative;
+}
+
+.translation-step.lossy {
+  background: rgba(166, 138, 45, 0.15);
+  border-color: var(--gold);
+}
+
+.translation-step-num {
+  font-family: var(--serif);
+  font-size: 13px;
+  color: var(--gold);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+
+.translation-step-title {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--cream);
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+
+.translation-step-desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--cream);
+  opacity: 0.75;
+}
+
+.translation-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  font-size: 18px;
+  font-weight: 700;
+  padding: 0 4px;
+}
+
+@media (max-width: 760px) {
+  .translation-chain { flex-direction: column; }
+  .translation-arrow { padding: 6px; transform: rotate(90deg); }
+}
+
+.translation-loss {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--gold);
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.55;
+}
+
+/* Response — what we do differently */
+.response-section {
+  margin: 56px 0 0;
+  padding: 44px 48px;
+  background: var(--accent-subtle);
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+}
+
+@media (max-width: 760px) {
+  .response-section { padding: 32px 24px; }
+}
+
+.response-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.response-title {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+  max-width: 720px;
+}
+
+.response-intro {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text);
+  margin-bottom: 28px;
+  max-width: 720px;
+}
+
+.response-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 760px) {
+  .response-grid { grid-template-columns: 1fr; }
+}
+
+.response-item {
+  padding: 22px 24px;
+  background: var(--paper);
+  border-radius: 4px;
+  border-left: 3px solid var(--accent);
+}
+
+.response-item-problem {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.response-item-answer {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  margin-bottom: 10px;
+}
+
+.response-item-body {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+/* ============ HOW IT WORKS ============ */
+.how-section {
+  margin-top: 80px;
+  padding-top: 56px;
+  border-top: 1px solid var(--rule);
+}
+
+.how-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-bottom: 56px;
+}
+
+@media (max-width: 900px) {
+  .how-steps { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 540px) {
+  .how-steps { grid-template-columns: 1fr; }
+}
+
+.how-step {
+  position: relative;
+  padding-top: 8px;
+}
+
+.how-step-num {
+  font-family: var(--serif);
+  font-size: 44px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin-bottom: 14px;
+  display: inline-block;
+}
+
+.how-step-num::after {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 2px;
+  background: var(--accent);
+  margin-top: 10px;
+}
+
+.how-step-title {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+
+.how-step-desc {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+/* ============ EXAMPLE ============ */
+.example-showcase {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-top: 32px;
+}
+
+@media (max-width: 900px) {
+  .example-showcase { grid-template-columns: 1fr; }
+}
+
+.example-side h4 {
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.example-input-card {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 24px 28px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+  font-family: var(--sans);
+  max-height: 540px;
+  overflow-y: auto;
+}
+
+.example-input-card .example-source {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.example-input-card p {
+  margin-bottom: 10px;
+}
+
+.example-output-card {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.example-out-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: start;
+}
+
+.example-out-name {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+
+.example-out-role {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.example-out-score {
+  text-align: right;
+}
+
+.example-out-score .big {
+  font-family: var(--serif);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.example-out-score .small {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.example-out-body {
+  padding: 20px 24px;
+}
+
+.example-mini-milestone {
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.example-mini-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 5px 0;
+  border-bottom: 1px dotted var(--rule);
+  align-items: center;
+}
+
+.example-mini-row:last-child { border-bottom: none; }
+
+.example-mini-row .mini-label { color: var(--text); font-weight: 500; }
+
+.example-mini-row .mini-bar {
+  width: 60px;
+  height: 5px;
+  background: var(--cream-2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 0 10px;
+  flex: 1;
+  max-width: 100px;
+}
+
+.example-mini-row .mini-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+.example-mini-row .mini-val {
+  font-weight: 700;
+  color: var(--ink);
+  font-size: 12px;
+  min-width: 28px;
+  text-align: right;
+}
+
+.example-mini-archetypes {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+
+.example-arch-mini {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 10px;
+  margin-bottom: 5px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+.example-arch-mini.primary {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.example-arch-mini.primary .mini-val { color: var(--accent); }
+
+.example-arch-mini .arch-name-mini {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.example-arch-mini .arch-tag-mini {
+  font-size: 9px;
+  padding: 1px 6px;
+  background: var(--accent);
+  color: var(--paper);
+  border-radius: 8px;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+}
+
+.example-verdict {
+  margin-top: 18px;
+  padding: 16px 18px;
+  background: var(--ink);
+  color: var(--cream);
+  border-radius: 4px;
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.example-verdict b {
+  color: var(--gold);
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* ============ SAVED ============ */
+.saved-list {
+  max-height: 320px;
+  overflow-y: auto;
+  border-radius: 4px;
+}
+
+.saved-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.saved-row:last-child { border-bottom: none; }
+
+.saved-row .saved-name {
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.saved-row .saved-meta {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-left: 10px;
+}
+
+.saved-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* ============ FOOTER ============ */
+footer.site-footer {
+  margin-top: 80px;
+  padding: 32px 0 0;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+footer.site-footer a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+footer.site-footer a:hover { text-decoration: underline; }
+
+.footer-attribution {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; }
+  .card, .report-header, .verdict-block { box-shadow: none !important; }
+  .how-section { display: none; }
+}
+
+/* Subtle scrollbar */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--cream); }
+::-webkit-scrollbar-thumb { background: var(--rule-2); border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+hr.subtle { border: none; border-top: 1px solid var(--rule); margin: 20px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ========== HEADER ========== -->
+<header class="site-header">
+  <div class="brand-mark">
+    <div class="brand-logo">PF</div>
+    <div>
+      <div class="brand-name">Prompt Forensics</div>
+      <div class="brand-tagline">AI-Native Talent Analysis</div>
+    </div>
+  </div>
+  
+  <div class="hero">
+    <h1>Grade the <em>work</em>, not the CV.</h1>
+    <p>Prompt Forensics reads the public output of AI-native practitioners — posts, artifacts, build logs, repositories — and produces a rigorous talent assessment. We score nine dimensions of AI-native fluency, map candidates to eight role archetypes, and generate a tailored pre-screen challenge so your team can filter in minutes, not weeks.</p>
+    
+    <div class="intro-stats">
+      <div class="stat-block">
+        <div class="stat-number">9</div>
+        <div class="stat-label">Skill Dimensions</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-number">8</div>
+        <div class="stat-label">Role Archetypes</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-number">15<span style="font-size:20px;">m</span></div>
+        <div class="stat-label">Pre-Screen Probe</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-number">72<span style="font-size:20px;">h</span></div>
+        <div class="stat-label">Trial Build Cycle</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ========== TOOL ========== -->
+<section class="card">
+  <div class="card-head">
+    <h3>Candidate Analysis</h3>
+    <span class="card-tag">Case <span id="caseNo">—</span></span>
+  </div>
+  <div class="card-body">
+
+    <div class="form-grid">
+      <div>
+        <label>Candidate identifier</label>
+        <input type="text" id="subject" placeholder="Full name or handle (e.g. Jane Doe, @janedoe)">
+      </div>
+      <div>
+        <label>Role context</label>
+        <input type="text" id="context" placeholder="e.g. Senior AI Engineer — Fintech, agents team">
+      </div>
+    </div>
+
+    <div>
+      <label>Public material</label>
+      <textarea id="postText" placeholder="Paste public writing from the candidate: LinkedIn posts, X threads, blog articles, README text, build logs, shipped artifact descriptions. More material produces sharper analysis. 500+ words recommended. Separate multiple posts with blank lines or --- dividers."></textarea>
+      <div class="helper-text">Paste only. No scraping, no URL fetching. Candidate material is processed locally and never persists on our servers.</div>
+    </div>
+
+    <div class="options-row">
+      <label class="option-toggle">
+        <input type="checkbox" id="anonymize"> 
+        Anonymise identity until engagement
+      </label>
+      <label class="option-toggle">
+        <input type="checkbox" id="saveLocal" checked> 
+        Save to local vault
+      </label>
+    </div>
+
+    <div class="btn-row">
+      <button class="primary-cta" id="runBtn">Run Analysis</button>
+      <button class="secondary" id="sampleBtn">Load Sample</button>
+      <button class="ghost" id="clearBtn">Clear</button>
+    </div>
+
+    <div class="error-block" id="errorBlock"></div>
+
+    <div class="loading" id="loading">
+      <div class="loading-title">Analysing candidate material</div>
+      <div class="loading-stages" id="loadingStages">
+        <div data-stage="0">Decomposing subject material</div>
+        <div data-stage="1">Scoring nine-dimension skill vector</div>
+        <div data-stage="2">Detecting LLM signals and stack fluency</div>
+        <div data-stage="3">Matching against eight role archetypes</div>
+        <div data-stage="4">Assigning milestone and trial tier</div>
+        <div data-stage="5">Generating verdict and tactical probes</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== REPORT OUTPUT ========== -->
+<div class="report" id="dossier"></div>
+
+<!-- ========== SAVED VAULT ========== -->
+<section class="card" style="margin-top: 32px;">
+  <div class="card-head">
+    <h3>Saved Analyses</h3>
+    <span class="card-tag">Local Vault</span>
+  </div>
+  <div class="card-body">
+    <div class="saved-list" id="savedList">
+      <div class="saved-empty">No analyses saved yet. Run your first analysis above.</div>
+    </div>
+    <div class="btn-row">
+      <button class="ghost" id="refreshBtn">Refresh</button>
+      <button class="ghost" id="purgeBtn">Clear Vault</button>
+    </div>
+  </div>
+</section>
+
+<!-- ========== HOW IT WORKS ========== -->
+<section class="how-section">
+  <div class="section-head">
+    <div class="section-eyebrow">Methodology</div>
+    <h2 class="section-title">How Prompt Forensics Works</h2>
+    <p class="section-intro">A four-stage analysis pipeline. From pasted material to a defensible hiring recommendation, with every step grounded in observable signal — not credentials, network, or self-reporting.</p>
+  </div>
+
+  <div class="how-steps">
+    <div class="how-step">
+      <div class="how-step-num">01</div>
+      <div class="how-step-title">Paste Public Material</div>
+      <div class="how-step-desc">Submit the candidate's own words: posts, articles, build logs, repositories. No scraping, no fetching — you control the input and the candidate's privacy.</div>
+    </div>
+    <div class="how-step">
+      <div class="how-step-num">02</div>
+      <div class="how-step-title">Forensic Analysis</div>
+      <div class="how-step-desc">Material is scored across nine AI-native fluency dimensions and matched against eight role archetypes. The composite score places the candidate on a five-tier milestone ladder from Entry to Co-Creator.</div>
+    </div>
+    <div class="how-step">
+      <div class="how-step-num">03</div>
+      <div class="how-step-title">Pre-Screen Probe</div>
+      <div class="how-step-desc">A fifteen-minute challenge is auto-generated to probe the candidate's primary archetype and verify identified gaps. AI tools are explicitly permitted — this filters for AI-natives, not against them.</div>
+    </div>
+    <div class="how-step">
+      <div class="how-step-num">04</div>
+      <div class="how-step-title">Trial Build Recommendation</div>
+      <div class="how-step-desc">For candidates who pass pre-screen, the report recommends an appropriate paid trial build tier — from 24-hour probe to week-long embed — representative of the actual role work.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== MARKET ANALYSIS ========== -->
+<section class="market-section">
+  <div class="section-head">
+    <div class="section-eyebrow">Why This Matters</div>
+    <h2 class="section-title">The Market Is Broken</h2>
+    <p class="section-intro">Companies are desperate for AI-native talent. AI-native practitioners can't get interviews. Both statements are true simultaneously. Here is what's actually happening — and why conventional recruitment cannot fix it.</p>
+  </div>
+
+  <!-- THE PARADOX -->
+  <div class="market-paradox">
+    <div class="paradox-side">
+      <div class="paradox-label">The Demand</div>
+      <div class="paradox-title">AI hiring is the fastest-growing skill requirement in recorded market history.</div>
+      <div class="paradox-body">Job postings mentioning AI have surged <strong>1,800%</strong> in the U.S. since 2023. <strong>Nearly 90%</strong> of CIOs and CTOs report their companies have created new AI roles in the past twelve months. The World Economic Forum projects that demand for AI and data roles will exceed supply by <strong>30–40%</strong> by 2027. Every serious organisation wants AI-native practitioners on the team.</div>
+    </div>
+    <div class="paradox-divider">versus</div>
+    <div class="paradox-side contradiction">
+      <div class="paradox-label">The Reality</div>
+      <div class="paradox-title">The hiring process systematically eliminates the candidates it was built to find.</div>
+      <div class="paradox-body">Companies average <strong>142 days</strong> to hire AI engineers — nearly three times longer than for general software engineers. <strong>88%</strong> of employers admit they are losing qualified candidates to filtering they cannot see. <strong>67%</strong> of CEOs say traditional hiring channels have failed. The candidates companies most want are the ones getting screened out first.</div>
+    </div>
+  </div>
+
+  <!-- THE STAT CALLOUTS -->
+  <div class="stat-callouts">
+    <div class="stat-callout">
+      <div class="stat-callout-num">1,800<span class="stat-unit">%</span></div>
+      <div class="stat-callout-label">Increase in U.S. job postings mentioning AI skills since 2023.</div>
+      <div class="stat-callout-source">Nash Squared · Tecla 2025</div>
+    </div>
+    <div class="stat-callout gold">
+      <div class="stat-callout-num">1 in 5</div>
+      <div class="stat-callout-label">Job postings are ghost jobs — positions with no real intent to hire.</div>
+      <div class="stat-callout-source">Greenhouse · LiveCareer 2025</div>
+    </div>
+    <div class="stat-callout gold">
+      <div class="stat-callout-num">88<span class="stat-unit">%</span></div>
+      <div class="stat-callout-label">Of employers lose qualified candidates to automated filtering they cannot observe.</div>
+      <div class="stat-callout-source">Harvard Business School · Accenture</div>
+    </div>
+    <div class="stat-callout ink">
+      <div class="stat-callout-num">142<span class="stat-unit">d</span></div>
+      <div class="stat-callout-label">Average days to hire an AI engineer versus 52 for general software.</div>
+      <div class="stat-callout-source">Full Scale · 2025 Industry Data</div>
+    </div>
+  </div>
+
+  <!-- THE TRANSLATION DIAGRAM -->
+  <div class="translation-diagram">
+    <h3>The Translation Failure</h3>
+    <div class="translation-sub">How AI-native signal is lost between the role and the hire.</div>
+    <div class="translation-chain">
+      <div class="translation-step">
+        <div class="translation-step-num">Step 01</div>
+        <div class="translation-step-title">Hiring Manager</div>
+        <div class="translation-step-desc">Knows they need someone who can ship AI-native work. Often not AI-native themselves.</div>
+      </div>
+      <div class="translation-arrow">→</div>
+      <div class="translation-step lossy">
+        <div class="translation-step-num">Step 02 · Lossy</div>
+        <div class="translation-step-title">Job Description</div>
+        <div class="translation-step-desc">Translated into keywords and year-of-experience thresholds for technologies that are 18 months old.</div>
+      </div>
+      <div class="translation-arrow">→</div>
+      <div class="translation-step lossy">
+        <div class="translation-step-num">Step 03 · Lossy</div>
+        <div class="translation-step-title">Recruiter Search</div>
+        <div class="translation-step-desc">Recruiter searches candidates by keyword. Cannot evaluate AI work directly.</div>
+      </div>
+      <div class="translation-arrow">→</div>
+      <div class="translation-step lossy">
+        <div class="translation-step-num">Step 04 · Lossy</div>
+        <div class="translation-step-title">ATS Filter</div>
+        <div class="translation-step-desc">Parser rejects candidates missing keywords, with gaps, or with non-standard CVs.</div>
+      </div>
+      <div class="translation-arrow">→</div>
+      <div class="translation-step">
+        <div class="translation-step-num">Step 05</div>
+        <div class="translation-step-title">Interview Panel</div>
+        <div class="translation-step-desc">Sees a fraction of the qualified pool — and often bans AI tools during the interview itself.</div>
+      </div>
+    </div>
+    <div class="translation-loss">At each translation step, the AI-native signal the hiring manager actually wanted is compressed further. By the time candidates reach the panel, the filter has removed most of the practitioners who would have been the strongest hires.</div>
+  </div>
+
+  <!-- FOUR STRUCTURAL FAILURES -->
+  <div class="section-head" style="margin-top: 64px;">
+    <div class="section-eyebrow">Four Structural Failures</div>
+    <h2 class="section-title">Why Conventional Hiring Cannot Solve This</h2>
+    <p class="section-intro">These are not edge cases. They are systemic failures baked into the infrastructure most companies use to hire for roles that did not exist two years ago.</p>
+  </div>
+
+  <div class="failures-grid">
+    <div class="failure-card">
+      <div class="failure-num">Failure 01</div>
+      <div class="failure-title">Keyword Filters Reject AI-Native Signal</div>
+      <div class="failure-body">Applicant Tracking Systems reject candidates whose CVs miss specific keyword matches — even when they are qualified. Nearly every major employer uses this approach. The best AI-native builders often do not use the tools the keyword lists are built around. They ship with sovereignty, choose stacks by fit, and describe work in their own vocabulary.</div>
+      <div class="failure-data"><strong>Data:</strong> 52% of keywords in a job description are missing from the average qualified candidate's CV. 99.7% of recruiters use ATS filtering. 88% of employers report losing qualified candidates to this process.</div>
+    </div>
+
+    <div class="failure-card">
+      <div class="failure-num">Failure 02</div>
+      <div class="failure-title">Ghost Jobs Poison the Signal</div>
+      <div class="failure-body">Roughly one in five job postings is a ghost job — posted with no intent to hire. 45% of HR professionals admit to posting them regularly. The consequence: candidates cannot tell real opportunities from signalling noise, and companies that are genuinely hiring compete with pipelines polluted by ghost listings from peers. Trust in the process collapses on both sides.</div>
+      <div class="failure-data"><strong>Data:</strong> 18–22% of U.S. job postings are ghost jobs. 93% of HR professionals engage in the practice to some degree. 30% of 2025 postings never resulted in a hire.</div>
+    </div>
+
+    <div class="failure-card">
+      <div class="failure-num">Failure 03</div>
+      <div class="failure-title">Recruiters Cannot Grade Work They Cannot Do</div>
+      <div class="failure-body">Most recruiters placing AI roles are not themselves AI-native. They match on credentials, titles, and years of experience — proxies that do not translate to AI work. An AI-native practitioner with two years of shipping production systems can be filtered out in favour of a candidate with eight years of experience in a superseded stack. The industry is attempting to evaluate a new category with tools built for the old one.</div>
+      <div class="failure-data"><strong>Data:</strong> 89% of candidates one year below the required experience threshold are auto-rejected. Most AI tools in production today did not exist when current seniority requirements were written.</div>
+    </div>
+
+    <div class="failure-card">
+      <div class="failure-num">Failure 04</div>
+      <div class="failure-title">The Interview Bans the Skill Being Hired For</div>
+      <div class="failure-body">A growing number of companies ban AI tools during technical interviews, claiming it is the only way to test "real" ability. This filters out precisely the candidates hiring managers wanted — the ones who ship fluently with AI every working day. Candidates who perform best without AI tools often underperform once hired, because the job itself requires the tools they were banned from demonstrating.</div>
+      <div class="failure-data"><strong>Data:</strong> 89% of executives believe conventional hiring processes need revision. Interview-to-hire conversion for AI roles is materially lower than other technical roles, despite higher starting salaries and stronger demand.</div>
+    </div>
+  </div>
+
+  <!-- THE STAKES -->
+  <div class="section-head" style="margin-top: 64px;">
+    <div class="section-eyebrow">The Cost</div>
+    <h2 class="section-title">What Each Missed Hire Actually Costs</h2>
+    <p class="section-intro">The cost is not theoretical. When the filter fails, the consequences show up on the P&L — and in which companies end up with the AI-native advantage and which do not.</p>
+  </div>
+
+  <div class="stat-callouts">
+    <div class="stat-callout">
+      <div class="stat-callout-num">$206<span class="stat-unit">k</span></div>
+      <div class="stat-callout-label">Average AI engineer salary in 2025 — up $50k from 2024.</div>
+      <div class="stat-callout-source">Second Talent 2025</div>
+    </div>
+    <div class="stat-callout gold">
+      <div class="stat-callout-num">$300<span class="stat-unit">k</span></div>
+      <div class="stat-callout-label">Additional cost per 30 hires for companies with poor candidate experience.</div>
+      <div class="stat-callout-source">LinkedIn 2025</div>
+    </div>
+    <div class="stat-callout ink">
+      <div class="stat-callout-num">36<span class="stat-unit">%</span></div>
+      <div class="stat-callout-label">Less likely to face talent shortage — for companies that hire from overlooked pools.</div>
+      <div class="stat-callout-source">Harvard Business School</div>
+    </div>
+    <div class="stat-callout">
+      <div class="stat-callout-num">30-40<span class="stat-unit">%</span></div>
+      <div class="stat-callout-label">Projected demand-supply gap for AI and data roles by 2027.</div>
+      <div class="stat-callout-source">World Economic Forum</div>
+    </div>
+  </div>
+
+  <!-- THE RESPONSE -->
+  <div class="response-section">
+    <div class="response-eyebrow">The Prompt Forensics Response</div>
+    <div class="response-title">Grade the work. Test with the tools the job actually uses. Pay candidates for their time regardless of outcome.</div>
+    <p class="response-intro">Our approach is built around each of the failures above. We do not try to patch the existing pipeline. We replace the pieces that were never going to work for a category of hiring that did not exist when they were designed.</p>
+
+    <div class="response-grid">
+      <div class="response-item">
+        <div class="response-item-problem">Against Failure 01 — Keyword filters</div>
+        <div class="response-item-answer">We grade the work itself, not CV keywords.</div>
+        <div class="response-item-body">Nine-dimension forensic analysis reads public material — posts, artifacts, build logs, shipped work — and produces scores that reflect what the candidate actually does. No CV required. No ATS in between.</div>
+      </div>
+
+      <div class="response-item">
+        <div class="response-item-problem">Against Failure 02 — Ghost jobs</div>
+        <div class="response-item-answer">Every trial build is a paid engagement with a real budget committed upfront.</div>
+        <div class="response-item-body">When we recommend a trial, the role is real, the budget is in escrow, and the candidate is paid regardless of hire outcome. Ghost roles cannot exist in this model — there is nothing to fake.</div>
+      </div>
+
+      <div class="response-item">
+        <div class="response-item-problem">Against Failure 03 — Recruiter evaluation gap</div>
+        <div class="response-item-answer">We match on role shape, not credentials.</div>
+        <div class="response-item-body">Eight role archetypes describe the shape of work a candidate does best. The match is based on evidence in their shipped output, not years-of-experience thresholds for technologies that change quarterly.</div>
+      </div>
+
+      <div class="response-item">
+        <div class="response-item-problem">Against Failure 04 — Interview bans</div>
+        <div class="response-item-answer">The pre-screen challenge requires AI tools. That is the test.</div>
+        <div class="response-item-body">A fifteen-minute challenge with AI tools explicitly permitted filters for AI-natives, not against them. Candidates who cannot build fluently with AI filter themselves out. Candidates who can, ship something the company can see working in under an hour.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== HOW IT WORKS continues with Example below ========== -->
+<section class="how-section" style="margin-top: 56px; padding-top: 56px;">
+  <div class="section-head">
+    <div class="section-eyebrow">Example Analysis</div>
+    <h2 class="section-title">Input and Output</h2>
+    <p class="section-intro">A worked example. On the left, publicly available material from a candidate. On the right, the structured output our analysis produces — scored, ranked, and ready for hiring review.</p>
+  </div>
+
+  <div class="example-showcase">
+    <div class="example-side">
+      <h4>Input — Candidate's Public Material</h4>
+      <div class="example-input-card">
+        <div class="example-source">LinkedIn post · 340 words · Senior AI Engineer candidate</div>
+        <p>Shipped a new internal tool this week. Team was spending 40+ hours per month triaging customer feedback across five channels. Built a single-page classifier that pulls from all sources, categorises by theme and urgency, and routes to the right team — ran it on vanilla JS with Claude's API, stored classifications in IndexedDB.</p>
+        <p>Three interesting things came up during the build:</p>
+        <p>First, the prompt design. I started with a standard few-shot classification prompt and it was fine, maybe 82% accuracy on our eval set. Switched to giving the model the team's own taxonomy document as context instead of examples — let the model extrapolate from our actual categorisation rules. Accuracy jumped to 94%. Less prompt, more signal.</p>
+        <p>Second, the eval rigour. We graded the first 200 classifications manually and found the model was systematically mislabelling "billing confusion" as "billing complaint" — different severity, different team. Added that as a specific callout in the prompt and the error rate on that category went from 18% to under 3%. Worth actually reading the failure modes.</p>
+        <p>Third, the deployment. Colleagues wanted me to wrap it in Next.js and deploy to Vercel. I pushed back — it's a single HTML file, runs locally, costs nothing to host, and works offline. The team using it doesn't care about the stack, they care that it opens instantly. Sometimes the best infrastructure is no infrastructure.</p>
+        <p>Going forward, thinking about how to make this pattern reusable for other teams. The classifier logic is generic; only the taxonomy changes. Considering a lightweight template that any team could configure without touching the code.</p>
+      </div>
+    </div>
+
+    <div class="example-side">
+      <h4>Output — Forensic Analysis Report</h4>
+      <div class="example-output-card">
+        <div class="example-out-header">
+          <div>
+            <div class="example-out-name">Jane Doe</div>
+            <div class="example-out-role">Senior AI Engineer — Fintech candidate</div>
+            <div class="example-mini-milestone" style="margin-top: 8px;">Integrator · Operator</div>
+          </div>
+          <div class="example-out-score">
+            <div class="big">71</div>
+            <div class="small">/ 100</div>
+          </div>
+        </div>
+        <div class="example-out-body">
+          <div style="font-size: 11px; letter-spacing: 0.15em; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 10px;">Top skill dimensions</div>
+          <div class="example-mini-row">
+            <span class="mini-label">Sovereignty Instinct</span>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width: 92%;"></div></div>
+            <span class="mini-val">92</span>
+          </div>
+          <div class="example-mini-row">
+            <span class="mini-label">Rigour & Evaluation</span>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width: 85%;"></div></div>
+            <span class="mini-val">85</span>
+          </div>
+          <div class="example-mini-row">
+            <span class="mini-label">Product Thinking</span>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width: 78%;"></div></div>
+            <span class="mini-val">78</span>
+          </div>
+          <div class="example-mini-row">
+            <span class="mini-label">Promptcraft</span>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width: 72%;"></div></div>
+            <span class="mini-val">72</span>
+          </div>
+          <div class="example-mini-row">
+            <span class="mini-label">Lateral Resolution</span>
+            <div class="mini-bar"><div class="mini-bar-fill" style="width: 68%;"></div></div>
+            <span class="mini-val">68</span>
+          </div>
+
+          <div class="example-mini-archetypes">
+            <div style="font-size: 11px; letter-spacing: 0.15em; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 10px;">Archetype match</div>
+            <div class="example-arch-mini primary">
+              <div class="arch-name-mini"><span class="arch-tag-mini">Primary</span> Compression Point</div>
+              <span class="mini-val">88</span>
+            </div>
+            <div class="example-arch-mini" style="background: var(--cream);">
+              <div class="arch-name-mini">Autopilot Builder</div>
+              <span class="mini-val">74</span>
+            </div>
+            <div class="example-arch-mini" style="background: var(--cream);">
+              <div class="arch-name-mini">Execution Engine</div>
+              <span class="mini-val">62</span>
+            </div>
+          </div>
+
+          <div class="example-verdict">
+            "Strong <b>Compression Point</b> signal with exceptional <b>sovereignty instinct</b>. Evidence of disciplined evaluation and measurable delivery. Ready for <b>Standard trial build</b> — 48 to 72 hour representative engagement."
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer class="site-footer">
+  <div>
+    © 2026 Prompt Forensics · Confidential by design · Sovereign infrastructure
+  </div>
+  <div class="footer-attribution">
+    Built by <a href="https://ai-nativesolutions.com">ai-nativesolutions.com</a> · κ₀
+  </div>
+</footer>
+
+</div>
+
+<!-- ========== CONSTANTS ========== -->
+<script>
+const ARCHETYPES = [
+  { id: 'compression', name: 'Compression Point', kshape: 'Application layer', fit: 'Takes ambiguous briefs and ships working tools. Reduces complexity into usable product.' },
+  { id: 'substrate', name: 'Substrate Architect', kshape: 'Infrastructure layer', fit: 'Designs the systems underneath the systems. Thinks in primitives, not features.' },
+  { id: 'execution', name: 'Execution Engine', kshape: 'Delivery layer', fit: 'Translates intent into shipped output at pace. High-velocity, pattern-literate.' },
+  { id: 'butler', name: 'Lateral Butler', kshape: 'Adjacent resolution', fit: 'Answers the need, not the literal question. Disambiguates surface requests.' },
+  { id: 'shadow', name: 'Shadow Auditor', kshape: 'Evaluation layer', fit: 'Finds what builds are hiding. Structured falsification, disciplined critique.' },
+  { id: 'context', name: 'Context Engineer', kshape: 'Agent design', fit: 'Seeds and scaffolds rather than prompts. Persistent-memory architectures.' },
+  { id: 'autopilot', name: 'Autopilot Builder', kshape: 'Automation layer', fit: 'Builds systems that run without the user. Sells the outcome, not the tool.' },
+  { id: 'mesh', name: 'Mesh Orchestrator', kshape: 'Distributed compute', fit: 'Off-cloud and sovereign inference. Browser, edge, and WebGPU fluency.' }
+];
+
+const SKILL_DIMS = [
+  { key: 'promptcraft', name: 'Promptcraft', weight: 0.15 },
+  { key: 'tooling', name: 'Tooling', weight: 0.10 },
+  { key: 'product_thinking', name: 'Product Thinking', weight: 0.15 },
+  { key: 'rigour_eval', name: 'Rigour & Evaluation', weight: 0.10 },
+  { key: 'sovereignty_instinct', name: 'Sovereignty Instinct', weight: 0.15 },
+  { key: 'notation_fluency', name: 'Notation Fluency', weight: 0.10 },
+  { key: 'shadow_awareness', name: 'Shadow Awareness', weight: 0.10 },
+  { key: 'lateral_resolution', name: 'Lateral Resolution', weight: 0.10 },
+  { key: 'monetization', name: 'Monetisation', weight: 0.05 }
+];
+
+const TRIAL_TIERS = [
+  { name: 'MICRO', price: '$', desc: '24-hour probe · single artifact · high-signal filter' },
+  { name: 'STANDARD', price: '$$', desc: '48–72 hour trial · representative spec · live observation' },
+  { name: 'DEEP', price: '$$$', desc: 'Multi-stage week · architecture and delivery · panel review' },
+  { name: 'EMBED', price: '$$$$', desc: 'Two-week embedded engagement · production-adjacent' }
+];
+
+const SAMPLE_POST = `Shipped a new internal tool this week. Team was spending 40+ hours per month triaging customer feedback across five channels. Built a single-page classifier that pulls from all sources, categorises by theme and urgency, and routes to the right team — ran it on vanilla JS with Claude's API, stored classifications in IndexedDB.
+
+Three interesting things came up during the build:
+
+First, the prompt design. I started with a standard few-shot classification prompt and it was fine, maybe 82% accuracy on our eval set. Switched to giving the model the team's own taxonomy document as context instead of examples — let the model extrapolate from our actual categorisation rules. Accuracy jumped to 94%. Less prompt, more signal.
+
+Second, the eval rigour. We graded the first 200 classifications manually and found the model was systematically mislabelling "billing confusion" as "billing complaint" — different severity, different team. Added that as a specific callout in the prompt and the error rate on that category went from 18% to under 3%. Worth actually reading the failure modes.
+
+Third, the deployment. Colleagues wanted me to wrap it in Next.js and deploy to Vercel. I pushed back — it's a single HTML file, runs locally, costs nothing to host, and works offline. The team using it doesn't care about the stack, they care that it opens instantly. Sometimes the best infrastructure is no infrastructure.
+
+Going forward, thinking about how to make this pattern reusable for other teams. The classifier logic is generic; only the taxonomy changes. Considering a lightweight template that any team could configure without touching the code.`;
+</script>
+
+<!-- ========== INDEXEDDB ========== -->
+<script>
+const DB_NAME = 'promptforensics_v2';
+const STORE = 'dossiers';
+
+function openDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE)) {
+        db.createObjectStore(STORE, { keyPath: 'id' });
+      }
+    };
+    req.onsuccess = (e) => res(e.target.result);
+    req.onerror = (e) => rej(e.target.error);
+  });
+}
+
+async function saveDossier(d) {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).put(d);
+    tx.oncomplete = () => res();
+    tx.onerror = (e) => rej(e.target.error);
+  });
+}
+
+async function listDossiers() {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(STORE, 'readonly');
+    const req = tx.objectStore(STORE).getAll();
+    req.onsuccess = () => res(req.result || []);
+    req.onerror = (e) => rej(e.target.error);
+  });
+}
+
+async function deleteDossier(id) {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).delete(id);
+    tx.oncomplete = () => res();
+    tx.onerror = (e) => rej(e.target.error);
+  });
+}
+
+async function purgeAll() {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).clear();
+    tx.oncomplete = () => res();
+    tx.onerror = (e) => rej(e.target.error);
+  });
+}
+</script>
+
+<!-- ========== FORENSIC ANALYSIS ========== -->
+<script>
+function buildSystemPrompt() {
+  return `You are a forensic talent analyst specialising in AI-native hiring. Your job: read a candidate's public writing and produce a rigorous assessment of their AI-native fluency, map them to role archetypes, and recommend a trial build tier.
+
+CRITICAL: Return ONLY a valid JSON object matching the exact schema below. No preamble, no markdown fences, no commentary.
+
+## SCORING DIMENSIONS (all 0-100 integers)
+1. promptcraft — system prompts, few-shot design, persona construction, prompt patterns
+2. tooling — infrastructure fluency, integration depth, API awareness, stack selection
+3. product_thinking — metrics, user flows, MVP instinct, user-centred reasoning
+4. rigour_eval — measurement, A/B testing, controlled experiments, failure-mode analysis
+5. sovereignty_instinct — owns stack or rents? Single-file preference? Anti-vendor-lock-in?
+6. notation_fluency — compression skill, specifications that read well, dual-purpose writing
+7. shadow_awareness — audits own work? Surfaces blind spots? Structured falsification?
+8. lateral_resolution — answers asked vs. needed question? Adjacent-domain resolution?
+9. monetization — pricing discipline, offers shipped, clear value capture
+
+Weights for composite: promptcraft 0.15, tooling 0.10, product_thinking 0.15, rigour_eval 0.10, sovereignty_instinct 0.15, notation_fluency 0.10, shadow_awareness 0.10, lateral_resolution 0.10, monetization 0.05.
+
+## 8 ARCHETYPES (score 0-100 fit for each)
+- compression: Compression Point — application layer, ships tools, turns ambiguity into product
+- substrate: Substrate Architect — infrastructure, generates systems, primitives-first thinking
+- execution: Execution Engine — delivery velocity, ships at pace, pattern-literate
+- butler: Lateral Butler — answers need not question, adjacent-domain resolution
+- shadow: Shadow Auditor — high-stakes AI, finds what builds are hiding
+- context: Context Engineer — agents, seeds not prompts, persistent memory
+- autopilot: Autopilot Builder — workflow automation, sells the outcome not the tool
+- mesh: Mesh Orchestrator — distributed compute, sovereign inference, browser+WebGPU
+
+Identify PRIMARY archetype (highest fit) and SECONDARY (second highest, only if ≥55).
+
+## MILESTONE (based on composite_score)
+- 0-29: Entry · Novice
+- 30-44: Explorer · Learner
+- 45-59: Practitioner · Builder
+- 60-74: Integrator · Operator
+- 75-100: Co-Creator · Leader
+
+## TRIAL TIER (based on composite + confidence)
+- $ MICRO: score <45 or low material volume — 24h probe, high-signal filter
+- $$ STANDARD: 45-64 — 48-72h trial, representative spec
+- $$$ DEEP: 65-79 — multi-stage, architecture + delivery
+- $$$$ EMBED: 80+ — week-long embedded, production-adjacent
+
+## OUTPUT SCHEMA
+{
+  "skill_vector": {
+    "promptcraft": 0-100, "tooling": 0-100, "product_thinking": 0-100, "rigour_eval": 0-100,
+    "sovereignty_instinct": 0-100, "notation_fluency": 0-100, "shadow_awareness": 0-100,
+    "lateral_resolution": 0-100, "monetization": 0-100
+  },
+  "composite_score": 0-100,
+  "milestone": "Entry · Novice" | "Explorer · Learner" | "Practitioner · Builder" | "Integrator · Operator" | "Co-Creator · Leader",
+  "llm_signals": {
+    "explicit": ["model names explicitly mentioned"],
+    "inferred": ["model names inferred from style"],
+    "confidence": 0-100
+  },
+  "tools_signals": ["concrete tools/frameworks/infra mentioned"],
+  "prompt_archetype": "Persona" | "Data-fed Automation" | "Retrieval/RAG scaffold" | "Tool-calling chain" | "Few-shot pattern" | "Guardrail/Safety" | "Critique/refine",
+  "persona_voice": "short phrase describing voice",
+  "archetype_scores": {
+    "compression": 0-100, "substrate": 0-100, "execution": 0-100, "butler": 0-100,
+    "shadow": 0-100, "context": 0-100, "autopilot": 0-100, "mesh": 0-100
+  },
+  "primary_archetype": "archetype id",
+  "secondary_archetype": "archetype id or null",
+  "strengths": ["3-5 specific observations — cite language or moves"],
+  "gaps": ["3-5 specific gaps — what they're NOT showing"],
+  "verdict": "2-3 sentence authoritative assessment. Plain, direct. Use b tags around 1-2 key phrases: <b>phrase</b>",
+  "trial_tier": "MICRO" | "STANDARD" | "DEEP" | "EMBED",
+  "trial_spec_hint": "1 sentence describing ideal trial build brief",
+  "probes": ["tactical follow-up question 1", "...2", "...3"],
+  "flags": ["PII redacted / TOS / low-material warnings / or 'none'"]
+}
+
+## GRADING PRINCIPLES
+- Evidence over tone. Score concrete shipped work above confident language.
+- Specificity matters. One precise observation beats three paragraphs of AI buzzwords.
+- Name-dropping tools is not tooling skill. Showing stack selection reasoning is.
+- If material is thin (<200 words), flag it and cap composite at 55.
+- Rigour without measurement evidence = low score regardless of tone.
+- Shadow awareness is rare: only score high if candidate discusses their own failures or audits their own work.
+- Sovereignty instinct high signals: single-file, own-stack, anti-lock-in, offline-first. Low: uncritical SaaS evangelism.`;
+}
+
+function buildUserPrompt(subject, context, postText) {
+  return `CANDIDATE: ${subject || '(unspecified)'}
+ROLE CONTEXT: ${context || '(general AI-native assessment)'}
+
+MATERIAL:
+---
+${postText}
+---
+
+Produce forensic analysis. Return JSON only.`;
+}
+
+async function analyze(postText, subject, context, attempt = 1) {
+  const body = {
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 4000,
+    system: buildSystemPrompt(),
+    messages: [{ role: 'user', content: buildUserPrompt(subject, context, postText) }]
+  };
+
+  let res;
+  try {
+    res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+  } catch (networkErr) {
+    if (attempt < 2) {
+      await new Promise(r => setTimeout(r, 1500));
+      return analyze(postText, subject, context, attempt + 1);
+    }
+    throw new Error(`Network error: ${networkErr.message}. Check connection.`);
+  }
+
+  if (!res.ok) {
+    const errTxt = await res.text();
+    if ((res.status === 429 || res.status >= 500) && attempt < 2) {
+      await new Promise(r => setTimeout(r, 2000));
+      return analyze(postText, subject, context, attempt + 1);
+    }
+    throw new Error(`API error ${res.status}: ${errTxt.slice(0, 200)}`);
+  }
+
+  const data = await res.json();
+  if (data.stop_reason === 'max_tokens') {
+    throw new Error('Response truncated. Try shorter material or contact support.');
+  }
+  
+  const textBlocks = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n');
+  if (!textBlocks) throw new Error('Empty response from model. Please retry.');
+  
+  const cleaned = textBlocks.replace(/```json/g, '').replace(/```/g, '').trim();
+  const firstBrace = cleaned.indexOf('{');
+  const lastBrace = cleaned.lastIndexOf('}');
+  if (firstBrace === -1 || lastBrace === -1) {
+    throw new Error('Invalid response format: ' + cleaned.slice(0, 120));
+  }
+  
+  try {
+    const parsed = JSON.parse(cleaned.substring(firstBrace, lastBrace + 1));
+    if (!parsed.skill_vector || !parsed.archetype_scores || typeof parsed.composite_score !== 'number') {
+      throw new Error('Response missing required fields.');
+    }
+    return parsed;
+  } catch (parseErr) {
+    throw new Error('Response parse failed: ' + parseErr.message);
+  }
+}
+</script>
+
+<!-- ========== RENDERING ========== -->
+<script>
+function barClass(score) {
+  if (score >= 70) return 'high';
+  if (score >= 40) return 'mid';
+  return '';
+}
+
+function renderDossier(dossier) {
+  const { id, subject, context, timestamp, anonymized, result } = dossier;
+
+  const displayName = anonymized
+    ? `<span class="redacted">Candidate · ${id.slice(-6).toUpperCase()}</span>`
+    : (subject || 'Unnamed Candidate');
+
+  const milestone = result.milestone || '—';
+  const composite = Math.round(result.composite_score || 0);
+
+  const archScores = Object.entries(result.archetype_scores || {})
+    .sort((a, b) => b[1] - a[1]);
+  
+  const primaryId = result.primary_archetype;
+  const secondaryId = result.secondary_archetype;
+
+  const archetypeCards = archScores.map(([aid, score]) => {
+    const meta = ARCHETYPES.find(a => a.id === aid) || { name: aid, kshape: '', fit: '' };
+    let cls = '';
+    let tag = '';
+    if (aid === primaryId) { cls = 'primary'; tag = '<div class="archetype-tag">Primary</div>'; }
+    else if (aid === secondaryId) { cls = 'secondary'; tag = '<div class="archetype-tag">Secondary</div>'; }
+    return `
+      <div class="archetype-card ${cls}">
+        ${tag}
+        <div class="arch-name">${meta.name}</div>
+        <div class="arch-fit">${meta.fit}</div>
+        <div class="arch-match-row">
+          <div class="arch-match">${Math.round(score)}<span class="arch-pct">/100</span></div>
+          <div class="arch-bar"><div class="arch-bar-fill" style="width:${score}%"></div></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const skillBars = SKILL_DIMS.map(dim => {
+    const s = Math.round(result.skill_vector?.[dim.key] || 0);
+    return `
+      <div class="skill-row">
+        <div class="skill-name">${dim.name}</div>
+        <div class="skill-bar-bg"><div class="skill-bar-fill ${barClass(s)}" style="width:${s}%"></div></div>
+        <div class="skill-score">${s}</div>
+      </div>
+    `;
+  }).join('');
+
+  const explicit = (result.llm_signals?.explicit || []).map(t => `<span class="tag explicit">${escapeHtml(t)}</span>`).join('');
+  const inferred = (result.llm_signals?.inferred || []).map(t => `<span class="tag inferred">${escapeHtml(t)}</span>`).join('');
+  const tools = (result.tools_signals || []).map(t => `<span class="tag tool">${escapeHtml(t)}</span>`).join('');
+
+  const strengths = (result.strengths || []).map(s => `<li>${escapeHtml(s)}</li>`).join('');
+  const gaps = (result.gaps || []).map(g => `<li>${escapeHtml(g)}</li>`).join('');
+  const probes = (result.probes || []).map(p => `<div class="probe-item">${escapeHtml(p)}</div>`).join('');
+
+  const trialTiers = TRIAL_TIERS.map(t => {
+    const match = t.name === result.trial_tier ? 'match' : '';
+    return `
+      <div class="tier ${match}">
+        <div class="tier-name">${t.name}</div>
+        <div class="tier-price">${t.price}</div>
+        <div class="tier-desc">${t.desc}</div>
+      </div>
+    `;
+  }).join('');
+
+  const flags = (result.flags || []).filter(f => f && f !== 'none').join(' · ');
+  const flagLine = flags ? `<div style="margin-top:14px;padding:12px 16px;background:#fef7e8;border:1px solid #f0d878;border-radius:4px;font-size:13px;color:#7a5c00;"><strong>Notes:</strong> ${escapeHtml(flags)}</div>` : '';
+
+  const verdict = sanitizeLimited(result.verdict || '—');
+
+  return `
+    <div class="report-header">
+      <div>
+        <div class="report-subject-name">${displayName}</div>
+        <div class="example-mini-milestone">${escapeHtml(milestone)}</div>
+        <div class="report-meta">
+          <div class="meta-item">
+            <div class="meta-label">Case</div>
+            <div class="meta-value">#${id}</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Role Context</div>
+            <div class="meta-value">${escapeHtml(context || '—')}</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Analysed</div>
+            <div class="meta-value">${new Date(timestamp).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Material</div>
+            <div class="meta-value">${dossier.raw_post_length || 0} chars</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Mode</div>
+            <div class="meta-value">${anonymized ? 'Anonymised' : 'Named'}</div>
+          </div>
+        </div>
+      </div>
+      <div class="score-panel">
+        <div class="score-label">Composite</div>
+        <div class="score-number">${composite}<span class="score-max"> / 100</span></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 20px;">
+      <div class="card-head">
+        <h3>Verdict</h3>
+        <span class="card-tag">Section I</span>
+      </div>
+      <div class="card-body" style="padding: 28px;">
+        <div class="verdict-block">
+          <span class="verdict-label">Summary Assessment</span>
+          <div class="verdict-text">${verdict}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 20px;">
+      <div class="card-head">
+        <h3>Skill Vector · Nine Dimensions</h3>
+        <span class="card-tag">Section II</span>
+      </div>
+      <div class="card-body">
+        <div class="skills-grid">${skillBars}</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 20px;">
+      <div class="card-head">
+        <h3>Archetype Match</h3>
+        <span class="card-tag">Section III</span>
+      </div>
+      <div class="card-body">
+        <div class="archetype-grid">${archetypeCards}</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 20px;">
+      <div class="card-head">
+        <h3>Signals Detected</h3>
+        <span class="card-tag">Section IV</span>
+      </div>
+      <div class="card-body">
+        <div class="signals-row">
+          <div class="signals-label">Explicit LLMs</div>
+          <div class="signals-list">${explicit || '<span class="helper-text">None detected</span>'}</div>
+        </div>
+        <div class="signals-row">
+          <div class="signals-label">Inferred LLMs · ${result.llm_signals?.confidence || 0}%</div>
+          <div class="signals-list">${inferred || '<span class="helper-text">None inferred</span>'}</div>
+        </div>
+        <div class="signals-row">
+          <div class="signals-label">Stack & Tools</div>
+          <div class="signals-list">${tools || '<span class="helper-text">None mentioned</span>'}</div>
+        </div>
+        <div class="signals-row">
+          <div class="signals-label">Pattern & Voice</div>
+          <div>
+            <strong style="color: var(--ink);">${escapeHtml(result.prompt_archetype || '—')}</strong>
+            <span style="color: var(--text-muted); margin-left: 8px; font-style: italic;">${escapeHtml(result.persona_voice || '—')}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 20px;">
+      <div class="card-head">
+        <h3>Findings</h3>
+        <span class="card-tag">Section V</span>
+      </div>
+      <div class="card-body">
+        <div class="findings">
+          <div class="finding-col strengths">
+            <h4>Strengths</h4>
+            <ul>${strengths}</ul>
+          </div>
+          <div class="finding-col gaps">
+            <h4>Gaps</h4>
+            <ul>${gaps}</ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 20px;">
+      <div class="card-head">
+        <h3>Trial Build Recommendation</h3>
+        <span class="card-tag">Section VI</span>
+      </div>
+      <div class="card-body">
+        <div class="trial-recommendation">
+          <div class="trial-label">Recommended Engagement</div>
+          <div class="trial-hint">${escapeHtml(result.trial_spec_hint || '—')}</div>
+          <div class="trial-tiers">${trialTiers}</div>
+          <div class="helper-text" style="margin-top: 14px;">Tier symbols indicate relative investment level. Actual fees set at engagement. Candidates are compensated regardless of hire outcome.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 20px;">
+      <div class="card-head">
+        <h3>Interview Probes</h3>
+        <span class="card-tag">Section VII</span>
+      </div>
+      <div class="card-body">
+        <div class="probes-list">${probes}</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 20px;">
+      <div class="card-head">
+        <h3>Pre-Screen Challenge</h3>
+        <span class="card-tag">Section VIII · 15-Minute Filter</span>
+      </div>
+      <div class="card-body">
+        <div id="probePanel-${id}" class="probe-panel ${dossier.probe ? 'generated' : ''}">
+          ${renderProbePanel(dossier)}
+        </div>
+      </div>
+    </div>
+
+    ${flagLine}
+
+    <div class="btn-row no-print">
+      ${!dossier.probe 
+        ? `<button class="primary-cta" onclick="generateProbe('${id}')">Generate Pre-Screen Challenge</button>` 
+        : `<button class="secondary" onclick="downloadProbe('${id}')">Download Challenge</button>
+           <button class="ghost" onclick="regenerateProbe('${id}')">Regenerate</button>`}
+      <button class="ghost" onclick="window.print()">Export PDF</button>
+      <button class="ghost" onclick="downloadJSON('${id}')">Download JSON</button>
+      <button class="ghost" onclick="downloadMarkdown('${id}')">Download Markdown</button>
+    </div>
+  `;
+}
+
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function sanitizeLimited(str) {
+  if (!str) return '';
+  const escaped = escapeHtml(str);
+  return escaped
+    .replace(/&lt;b&gt;/g, '<b>')
+    .replace(/&lt;\/b&gt;/g, '</b>');
+}
+</script>
+
+<!-- ========== EXPORTS ========== -->
+<script>
+let currentDossier = null;
+
+async function downloadJSON(id) {
+  const list = await listDossiers();
+  const d = list.find(x => x.id === id) || currentDossier;
+  if (!d) return;
+  const blob = new Blob([JSON.stringify(d, null, 2)], { type: 'application/json' });
+  triggerDownload(blob, `analysis_${id}.json`);
+}
+
+async function downloadMarkdown(id) {
+  const list = await listDossiers();
+  const d = list.find(x => x.id === id) || currentDossier;
+  if (!d) return;
+  const md = toMarkdown(d);
+  const blob = new Blob([md], { type: 'text/markdown' });
+  triggerDownload(blob, `analysis_${id}.md`);
+}
+
+function toMarkdown(d) {
+  const r = d.result;
+  const sv = r.skill_vector || {};
+  const as = r.archetype_scores || {};
+  const prim = ARCHETYPES.find(a => a.id === r.primary_archetype)?.name || r.primary_archetype;
+  const sec = ARCHETYPES.find(a => a.id === r.secondary_archetype)?.name || r.secondary_archetype || '—';
+
+  return `# Prompt Forensics Analysis
+## ${d.anonymized ? `Candidate ${d.id.slice(-6).toUpperCase()}` : (d.subject || 'Unnamed')}
+
+**Case:** #${d.id}  
+**Role context:** ${d.context || '—'}  
+**Analysed:** ${new Date(d.timestamp).toISOString()}  
+**Mode:** ${d.anonymized ? 'Anonymised' : 'Named'}
+
+## Summary
+- **Composite score:** ${Math.round(r.composite_score)} / 100
+- **Milestone:** ${r.milestone}
+- **Trial tier:** ${r.trial_tier}
+- **Primary archetype:** ${prim}
+- **Secondary archetype:** ${sec}
+
+## Verdict
+${r.verdict}
+
+## Skill Vector
+${SKILL_DIMS.map(d => `- ${d.name}: **${sv[d.key] ?? 0}**`).join('\n')}
+
+## Archetype Match
+${Object.entries(as).sort((a,b)=>b[1]-a[1]).map(([k,v]) => {
+  const meta = ARCHETYPES.find(a=>a.id===k);
+  return `- ${meta?.name || k}: **${v}**`;
+}).join('\n')}
+
+## Signals
+- **Explicit:** ${(r.llm_signals?.explicit || []).join(', ') || 'none'}
+- **Inferred:** ${(r.llm_signals?.inferred || []).join(', ') || 'none'} (confidence ${r.llm_signals?.confidence || 0}%)
+- **Tools:** ${(r.tools_signals || []).join(', ') || 'none'}
+- **Prompt archetype:** ${r.prompt_archetype}
+- **Persona voice:** ${r.persona_voice}
+
+## Strengths
+${(r.strengths || []).map(s => `- ${s}`).join('\n')}
+
+## Gaps
+${(r.gaps || []).map(g => `- ${g}`).join('\n')}
+
+## Interview Probes
+${(r.probes || []).map((p, i) => `${i+1}. ${p}`).join('\n')}
+
+## Trial Build Hint
+${r.trial_spec_hint}
+
+## Flags
+${(r.flags || []).join(' · ') || 'none'}
+
+${d.probe ? `
+---
+
+## Pre-Screen Challenge
+
+**Targeting:** ${ARCHETYPES.find(a => a.id === r.primary_archetype)?.name || r.primary_archetype}  
+**Time cap:** ${d.probe.time_cap_minutes || 15} minutes  
+**Seniority hint:** ${d.probe.seniority_hint || '—'}
+
+### Scenario
+${d.probe.scenario}
+
+### Brief
+${d.probe.brief}
+
+### Deliverable
+${d.probe.deliverable}
+
+### Success criteria
+${(d.probe.success_criteria || []).map(c => `- ${c}`).join('\n')}
+
+### Grading rubric
+${(d.probe.grading_rubric || []).map(c => `- ${c}`).join('\n')}
+
+### Red flags
+${(d.probe.red_flags || []).map(c => `- ${c}`).join('\n')}
+` : ''}
+
+---
+_Prompt Forensics · AI-Native Talent Analysis · Built by ai-nativesolutions.com_
+`;
+}
+
+function triggerDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+
+<!-- ========== PRE-SCREEN PROBE GENERATOR ========== -->
+<script>
+function buildProbeSystemPrompt() {
+  return `You generate pre-screen challenges for AI-native hiring. Given a forensic assessment and role context, generate a 15-minute challenge that filters whether this candidate can actually build with AI. This is the auto-filter before any human reviewer invests time.
+
+CRITICAL CONSTRAINTS:
+- Challenge MUST be completable in 15 minutes with AI tools allowed
+- Challenge MUST target the candidate's PRIMARY archetype — probe their claimed shape
+- Challenge MUST target at least one IDENTIFIED GAP — verify or falsify the concern
+- Challenge MUST be representative of real role work, not trivia
+- Challenge MUST produce an observable artifact (markdown spec, code snippet, written analysis, or structured plan)
+- AI tools are explicitly ALLOWED — that is the test
+- Success criteria MUST be gradeable in under 5 minutes
+
+ARCHETYPE-SPECIFIC PROBE FOCUS:
+- compression: give a messy brief, ask them to compress to a 200-word spec
+- substrate: give a surface system, ask them to describe what sits beneath in 10 bullets
+- execution: give a half-built artifact, ask them to ship the missing 20% in 15 min
+- butler: give a surface-level user request, ask them to identify the actual need
+- shadow: give a confident-looking build, ask them to find what it's hiding
+- context: give a vague task, ask them to write the seed/system prompt for an agent to solve it
+- autopilot: give a workflow, ask them to describe what makes it run without the user
+- mesh: give a cloud-dependent architecture, ask them to sovereign-ise it
+
+OUTPUT SCHEMA — return ONLY this JSON:
+{
+  "scenario": "1-2 sentence setup",
+  "brief": "3-5 sentence challenge",
+  "deliverable": "exact artifact format + size constraint",
+  "time_cap_minutes": 15,
+  "allowed_tools": "plain statement that AI tools are allowed",
+  "success_criteria": ["3-5 observable criteria"],
+  "grading_rubric": ["3-5 strong vs weak tells"],
+  "red_flags": ["2-3 auto-fail conditions"],
+  "seniority_hint": "MID | SENIOR | STAFF"
+}
+
+No preamble, no fences, no commentary. JSON only.`;
+}
+
+function buildProbeUserPrompt(dossier, roleContext) {
+  const r = dossier.result;
+  const archMeta = ARCHETYPES.find(a => a.id === r.primary_archetype) || {};
+  return `CANDIDATE FORENSIC ASSESSMENT:
+
+Primary archetype: ${archMeta.name || r.primary_archetype}
+Secondary archetype: ${r.secondary_archetype || 'none'}
+Composite score: ${Math.round(r.composite_score)}/100
+Milestone: ${r.milestone}
+Persona voice: ${r.persona_voice}
+
+Strengths (what they demonstrate):
+${(r.strengths || []).map(s => '- ' + s).join('\n')}
+
+Gaps (what they don't show — target these):
+${(r.gaps || []).map(g => '- ' + g).join('\n')}
+
+Recommended trial tier: ${r.trial_tier}
+Trial spec hint: ${r.trial_spec_hint}
+
+ROLE CONTEXT:
+${roleContext || dossier.context || 'General AI-native role — probe primary archetype'}
+
+Generate a 15-minute pre-screen challenge. Target their archetype. Probe their gaps. Return JSON only.`;
+}
+
+async function callProbeAPI(dossier, roleContext, attempt = 1) {
+  const body = {
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 1500,
+    system: buildProbeSystemPrompt(),
+    messages: [{ role: 'user', content: buildProbeUserPrompt(dossier, roleContext) }]
+  };
+
+  let res;
+  try {
+    res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+  } catch (err) {
+    if (attempt < 2) {
+      await new Promise(r => setTimeout(r, 1500));
+      return callProbeAPI(dossier, roleContext, attempt + 1);
+    }
+    throw new Error(`Network error: ${err.message}`);
+  }
+
+  if (!res.ok) {
+    const errTxt = await res.text();
+    if ((res.status === 429 || res.status >= 500) && attempt < 2) {
+      await new Promise(r => setTimeout(r, 2000));
+      return callProbeAPI(dossier, roleContext, attempt + 1);
+    }
+    throw new Error(`API error ${res.status}: ${errTxt.slice(0, 200)}`);
+  }
+
+  const data = await res.json();
+  if (data.stop_reason === 'max_tokens') {
+    throw new Error('Challenge response truncated. Please retry.');
+  }
+
+  const textBlocks = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n');
+  if (!textBlocks) throw new Error('Empty response.');
+
+  const cleaned = textBlocks.replace(/```json/g, '').replace(/```/g, '').trim();
+  const firstBrace = cleaned.indexOf('{');
+  const lastBrace = cleaned.lastIndexOf('}');
+  if (firstBrace === -1 || lastBrace === -1) {
+    throw new Error('Invalid challenge response format.');
+  }
+  
+  try {
+    const parsed = JSON.parse(cleaned.substring(firstBrace, lastBrace + 1));
+    if (!parsed.scenario || !parsed.brief || !parsed.deliverable) {
+      throw new Error('Challenge missing required fields.');
+    }
+    return parsed;
+  } catch (e) {
+    throw new Error('Challenge parse failed: ' + e.message);
+  }
+}
+
+async function generateProbe(id) {
+  const list = await listDossiers();
+  const dossier = list.find(x => x.id === id) || (currentDossier && currentDossier.id === id ? currentDossier : null);
+  if (!dossier) { alert('Analysis not found.'); return; }
+
+  const panel = document.getElementById(`probePanel-${id}`);
+  if (panel) {
+    panel.innerHTML = '<div class="probe-loading">Generating pre-screen challenge for ' + 
+      (ARCHETYPES.find(a => a.id === dossier.result.primary_archetype)?.name || 'this candidate') + '</div>';
+  }
+
+  try {
+    const probe = await callProbeAPI(dossier, dossier.context);
+    probe.generated_at = Date.now();
+    dossier.probe = probe;
+    
+    try { await saveDossier(dossier); } catch (_) {}
+    
+    if (currentDossier && currentDossier.id === id) currentDossier = dossier;
+    
+    const el = document.getElementById('dossier');
+    el.innerHTML = renderDossier(dossier);
+    await refreshSavedList();
+    
+    const newPanel = document.getElementById(`probePanel-${id}`);
+    if (newPanel) {
+      try { newPanel.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+      catch (_) { newPanel.scrollIntoView(); }
+    }
+  } catch (e) {
+    console.error('Challenge generation failed:', e);
+    if (panel) {
+      panel.innerHTML = `
+        <div class="probe-empty">
+          <div class="probe-icon">⚠</div>
+          <div class="probe-title">Challenge Generation Failed</div>
+          <div class="probe-desc">${escapeHtml(e.message || String(e))}</div>
+          <div style="margin-top:16px;"><button class="secondary" onclick="generateProbe('${id}')">Retry</button></div>
+        </div>
+      `;
+    }
+  }
+}
+
+async function regenerateProbe(id) {
+  if (!confirm('Regenerate challenge? Current challenge will be replaced.')) return;
+  const list = await listDossiers();
+  const dossier = list.find(x => x.id === id) || currentDossier;
+  if (!dossier) return;
+  delete dossier.probe;
+  try { await saveDossier(dossier); } catch (_) {}
+  if (currentDossier && currentDossier.id === id) currentDossier = dossier;
+  await generateProbe(id);
+}
+
+async function downloadProbe(id) {
+  const list = await listDossiers();
+  const d = list.find(x => x.id === id) || currentDossier;
+  if (!d || !d.probe) { alert('No challenge generated yet.'); return; }
+  const md = probeToMarkdown(d);
+  const blob = new Blob([md], { type: 'text/markdown' });
+  triggerDownload(blob, `challenge_${id}.md`);
+}
+
+function probeToMarkdown(d) {
+  const p = d.probe;
+  const archMeta = ARCHETYPES.find(a => a.id === d.result.primary_archetype) || {};
+  return `# Pre-Screen Challenge
+## ${d.anonymized ? `Candidate ${d.id.slice(-6).toUpperCase()}` : (d.subject || 'unnamed')}
+
+**Case:** #${d.id}  
+**Targeting archetype:** ${archMeta.name || d.result.primary_archetype}  
+**Time cap:** ${p.time_cap_minutes || 15} minutes  
+**Seniority level:** ${p.seniority_hint || '—'}  
+**Generated:** ${new Date(p.generated_at || Date.now()).toISOString()}
+
+---
+
+## Scenario
+${p.scenario}
+
+## Brief
+${p.brief}
+
+## Deliverable
+${p.deliverable}
+
+## Allowed tools
+${p.allowed_tools || 'AI tools are allowed and encouraged. This is a pre-screen for AI-native hiring.'}
+
+---
+
+## Success criteria
+${(p.success_criteria || []).map(c => `- ${c}`).join('\n')}
+
+## Grading rubric
+${(p.grading_rubric || []).map(c => `- ${c}`).join('\n')}
+
+## Red flags (auto-fail)
+${(p.red_flags || []).map(c => `- ${c}`).join('\n')}
+
+---
+_Prompt Forensics · Pre-Screen Challenge · Built by ai-nativesolutions.com_  
+_Candidates are compensated regardless of outcome. Artifact ownership remains candidate's._
+`;
+}
+
+function renderProbePanel(dossier) {
+  if (!dossier.probe) {
+    return `
+      <div class="probe-empty">
+        <div class="probe-icon">◆</div>
+        <div class="probe-title">Pre-Screen Challenge Not Yet Generated</div>
+        <div class="probe-desc">Generate a 15-minute filter challenge tailored to this candidate's primary archetype and identified gaps. Filters non-AI-natives before investing in a paid trial build.</div>
+      </div>
+    `;
+  }
+  
+  const p = dossier.probe;
+  const archMeta = ARCHETYPES.find(a => a.id === dossier.result.primary_archetype) || {};
+  
+  return `
+    <div class="probe-content">
+      <div class="probe-meta">
+        <div class="probe-meta-item">
+          <strong>Targeting</strong>
+          <span>${escapeHtml(archMeta.name || dossier.result.primary_archetype)}</span>
+        </div>
+        <div class="probe-meta-item">
+          <strong>Time Cap</strong>
+          <span>${p.time_cap_minutes || 15} minutes</span>
+        </div>
+        <div class="probe-meta-item">
+          <strong>Seniority</strong>
+          <span>${escapeHtml(p.seniority_hint || '—')}</span>
+        </div>
+        <div class="probe-meta-item">
+          <strong>AI Tools</strong>
+          <span>Permitted</span>
+        </div>
+      </div>
+      
+      <div class="probe-section">
+        <h5>Scenario</h5>
+        <div class="probe-text">${escapeHtml(p.scenario || '—')}</div>
+      </div>
+      
+      <div class="probe-section">
+        <h5>Brief</h5>
+        <div class="probe-text">${escapeHtml(p.brief || '—')}</div>
+      </div>
+      
+      <div class="probe-section">
+        <h5>Deliverable</h5>
+        <div class="probe-text">${escapeHtml(p.deliverable || '—')}</div>
+      </div>
+      
+      <div class="probe-section">
+        <h5>Success Criteria</h5>
+        <ul>${(p.success_criteria || []).map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ul>
+      </div>
+      
+      <div class="probe-section">
+        <h5>Grading Rubric — Strong vs Weak Tells</h5>
+        <ul>${(p.grading_rubric || []).map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ul>
+      </div>
+      
+      <div class="probe-section red-flags">
+        <h5>Red Flags — Auto-Fail</h5>
+        <ul>${(p.red_flags || []).map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ul>
+      </div>
+    </div>
+  `;
+}
+</script>
+
+<!-- ========== SAVED LIST ========== -->
+<script>
+async function refreshSavedList() {
+  const list = await listDossiers();
+  const el = document.getElementById('savedList');
+  if (!list.length) {
+    el.innerHTML = '<div class="saved-empty">No analyses saved yet. Run your first analysis above.</div>';
+    return;
+  }
+  list.sort((a, b) => b.timestamp - a.timestamp);
+  el.innerHTML = list.map(d => `
+    <div class="saved-row">
+      <div>
+        <span class="saved-name">${d.anonymized ? `Candidate ${d.id.slice(-6).toUpperCase()}` : escapeHtml(d.subject || 'unnamed')}</span>
+        <span class="saved-meta">${Math.round(d.result.composite_score)} / 100 · ${escapeHtml(d.result.milestone)}</span>
+      </div>
+      <button class="ghost" onclick="loadDossier('${d.id}')">View</button>
+      <button class="ghost" onclick="downloadMarkdown('${d.id}')">.md</button>
+      <button class="ghost" onclick="removeDossier('${d.id}')">Remove</button>
+    </div>
+  `).join('');
+}
+
+async function loadDossier(id) {
+  const list = await listDossiers();
+  const d = list.find(x => x.id === id);
+  if (!d) return;
+  currentDossier = d;
+  const el = document.getElementById('dossier');
+  el.innerHTML = renderDossier(d);
+  el.classList.add('show');
+  try { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  catch (_) { el.scrollIntoView(); }
+}
+
+async function removeDossier(id) {
+  if (!confirm('Remove this analysis?')) return;
+  await deleteDossier(id);
+  await refreshSavedList();
+}
+</script>
+
+<!-- ========== WIRING ========== -->
+<script>
+function updateCaseNo() {
+  const n = 'PF' + Math.random().toString(36).slice(2, 8).toUpperCase();
+  document.getElementById('caseNo').textContent = n;
+  return n;
+}
+
+function setStage(idx) {
+  document.querySelectorAll('#loadingStages div').forEach((d, i) => {
+    d.classList.remove('active', 'done');
+    if (i < idx) d.classList.add('done');
+    else if (i === idx) d.classList.add('active');
+  });
+}
+
+async function runAnalysis() {
+  const postText = document.getElementById('postText').value.trim();
+  const subject = document.getElementById('subject').value.trim();
+  const context = document.getElementById('context').value.trim();
+  const anonymize = document.getElementById('anonymize').checked;
+  const saveLocal = document.getElementById('saveLocal').checked;
+
+  const err = document.getElementById('errorBlock');
+  err.classList.remove('show');
+
+  if (postText.length < 100) {
+    err.textContent = 'Please paste at least 100 characters of candidate material. Analysis needs signal to work with.';
+    err.classList.add('show');
+    return;
+  }
+
+  const runBtn = document.getElementById('runBtn');
+  runBtn.disabled = true;
+  document.getElementById('loading').classList.add('show');
+  document.getElementById('dossier').classList.remove('show');
+
+  let stageIdx = 0;
+  setStage(0);
+  const stageInterval = setInterval(() => {
+    stageIdx = Math.min(stageIdx + 1, 5);
+    setStage(stageIdx);
+  }, 2500);
+
+  try {
+    const result = await analyze(postText, subject, context);
+    clearInterval(stageInterval);
+
+    const id = 'PF' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase();
+    const dossier = {
+      id,
+      subject: anonymize ? '' : subject,
+      context,
+      timestamp: Date.now(),
+      anonymized: anonymize,
+      raw_post_length: postText.length,
+      result
+    };
+
+    currentDossier = dossier;
+
+    if (saveLocal) {
+      await saveDossier(dossier);
+      await refreshSavedList();
+    }
+
+    const el = document.getElementById('dossier');
+    el.innerHTML = renderDossier(dossier);
+    el.classList.add('show');
+    document.getElementById('loading').classList.remove('show');
+    try { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    catch (_) { el.scrollIntoView(); }
+
+  } catch (e) {
+    clearInterval(stageInterval);
+    document.getElementById('loading').classList.remove('show');
+    err.textContent = 'Analysis error: ' + (e.message || String(e));
+    err.classList.add('show');
+    console.error(e);
+  } finally {
+    runBtn.disabled = false;
+  }
+}
+
+document.getElementById('runBtn').addEventListener('click', runAnalysis);
+document.getElementById('sampleBtn').addEventListener('click', () => {
+  document.getElementById('subject').value = 'Jane Doe';
+  document.getElementById('context').value = 'Senior AI Engineer — Fintech, agents team';
+  document.getElementById('postText').value = SAMPLE_POST;
+});
+document.getElementById('clearBtn').addEventListener('click', () => {
+  document.getElementById('subject').value = '';
+  document.getElementById('context').value = '';
+  document.getElementById('postText').value = '';
+  document.getElementById('errorBlock').classList.remove('show');
+  document.getElementById('dossier').classList.remove('show');
+});
+document.getElementById('refreshBtn').addEventListener('click', refreshSavedList);
+document.getElementById('purgeBtn').addEventListener('click', async () => {
+  if (!confirm('Clear all saved analyses? This cannot be undone.')) return;
+  await purgeAll();
+  await refreshSavedList();
+});
+
+updateCaseNo();
+refreshSavedList();
+</script>
+
+</body>
+</html>
