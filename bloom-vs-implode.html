@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BLOOM vs IMPLODE · prime recursive holographics</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=JetBrains+Mono:wght@300;400&display=swap');
+:root{--void:#050810;--brass:#d4a94a;--crimson:#b8484f;--sage:#88a884;--ink:#d8cdb4;--faint:#6e6450}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--void);color:var(--ink);font-family:'JetBrains Mono',monospace;overflow:hidden;height:100vh}
+canvas{display:block;position:fixed;inset:0;z-index:1}
+
+#hud{position:fixed;top:0;left:0;right:0;padding:14px 24px;display:flex;justify-content:space-between;align-items:baseline;z-index:10;pointer-events:none;background:linear-gradient(to bottom,rgba(5,8,16,0.85),transparent)}
+#hud h1{font-family:'Cinzel',serif;font-weight:600;font-size:14px;letter-spacing:0.25em;text-transform:uppercase;color:var(--brass)}
+#hud h1 small{display:block;font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:12px;color:var(--faint);text-transform:none;letter-spacing:0.02em;margin-top:3px}
+#hud .meta{font-size:9px;color:var(--faint);text-align:right;letter-spacing:0.15em}
+
+#labels{position:fixed;top:50%;left:0;right:0;z-index:8;pointer-events:none;display:flex;justify-content:space-around;transform:translateY(-50%)}
+.side-label{text-align:center;opacity:0;transition:opacity 0.8s}
+.side-label.show{opacity:1}
+.side-label .big{font-family:'Cinzel',serif;font-weight:700;font-size:clamp(20px,3vw,36px);letter-spacing:0.15em}
+.side-label .sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(12px,1.5vw,18px);color:var(--faint);margin-top:4px}
+.side-label.bloom .big{color:var(--sage)}
+.side-label.implode .big{color:var(--crimson)}
+
+#seq{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:8;pointer-events:none;text-align:center}
+#seq .chain{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--brass);letter-spacing:0.1em;opacity:0.8}
+#seq .explain{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--faint);margin-top:6px}
+
+#phase{position:fixed;top:55%;left:50%;transform:translate(-50%,-50%);z-index:7;pointer-events:none;text-align:center;opacity:0;transition:opacity 0.6s}
+#phase.show{opacity:1}
+#phase .num{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--brass);letter-spacing:0.3em}
+#phase .name{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(22px,3vw,34px);color:var(--ink);margin-top:4px}
+
+#controls{position:fixed;bottom:0;left:0;right:0;padding:12px 24px;display:flex;justify-content:space-between;align-items:center;z-index:11;background:linear-gradient(to top,rgba(5,8,16,0.9),transparent)}
+#controls button{background:transparent;border:1px solid rgba(212,169,74,0.3);color:var(--brass);font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;padding:7px 14px;cursor:pointer;transition:all 0.2s}
+#controls button:hover{border-color:var(--brass);color:var(--ink)}
+#controls button.primary{background:var(--brass);color:var(--void);border-color:var(--brass);font-weight:600}
+#controls button.rec{background:#8b3a3a;color:var(--ink);border-color:#8b3a3a;animation:rp 1s ease infinite}
+@keyframes rp{0%,100%{opacity:1}50%{opacity:0.6}}
+#time{font-size:9px;color:var(--faint);letter-spacing:0.12em;font-variant-numeric:tabular-nums;min-width:80px;text-align:center}
+
+#metrics{position:fixed;bottom:52px;left:0;right:0;display:flex;justify-content:center;gap:40px;z-index:9;pointer-events:none}
+.metric{text-align:center}
+.metric .v{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--ink);line-height:1}
+.metric .v.gold{color:var(--brass)}
+.metric .v.red{color:var(--crimson)}
+.metric .v.green{color:var(--sage)}
+.metric .u{font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:var(--faint);margin-top:3px}
+
+#toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(5,8,16,0.95);border:1px solid var(--brass);padding:12px 22px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.2em;color:var(--brass);z-index:100;opacity:0;transition:opacity 0.4s;pointer-events:none}
+#toast.show{opacity:1}
+
+#dl{position:fixed;top:80px;right:20px;background:rgba(5,8,16,0.95);border:1px solid var(--brass);padding:14px 18px;z-index:50;display:none}
+#dl.show{display:block}
+#dl h3{font-family:'Cinzel',serif;font-size:11px;color:var(--brass);margin-bottom:6px;letter-spacing:0.15em}
+#dl a{display:inline-block;background:var(--brass);color:var(--void);text-decoration:none;padding:7px 14px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.18em;font-weight:600}
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <h1>BLOOM vs IMPLODE<small>prime recursive holographics · a(n+1) = prime(a(n))</small></h1>
+  <div class="meta">drag to rotate · scroll to zoom<br>a(0)=2 → 3 → 5 → 11 → 31 → 127(M₇) → 709</div>
+</div>
+
+<div id="labels">
+  <div class="side-label implode" id="lbl-implode"><div class="big">IMPLODE</div><div class="sub">cube → tetrad · 8→4 · −dimension · ⛔</div></div>
+  <div class="side-label bloom" id="lbl-bloom"><div class="big">BLOOM</div><div class="sub">cube → tesseract · 8→16 · +dimension · 🌸</div></div>
+</div>
+
+<div id="phase"><div class="num" id="ph-num">PHASE 0</div><div class="name" id="ph-name">the cube</div></div>
+
+<div id="seq">
+  <div class="chain" id="seq-chain">a(0)=2</div>
+  <div class="explain" id="seq-explain">the seed</div>
+</div>
+
+<div id="metrics">
+  <div class="metric"><div class="v red" id="m-iv">8</div><div class="u">implode verts</div></div>
+  <div class="metric"><div class="v gold" id="m-prime">2</div><div class="u">prime depth</div></div>
+  <div class="metric"><div class="v green" id="m-bv">8</div><div class="u">bloom verts</div></div>
+  <div class="metric"><div class="v gold" id="m-dim">3D</div><div class="u">dimension</div></div>
+</div>
+
+<div id="controls">
+  <div><button id="play" class="primary">▶ PLAY</button><button id="restart" style="margin-left:6px">↻</button></div>
+  <div id="time">0:00 / 1:30</div>
+  <div><button id="rec">⏺ RECORD</button></div>
+</div>
+
+<div id="toast"></div>
+<div id="dl"><h3>READY</h3><a id="dl-link" href="#" download>DOWNLOAD</a></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const TAU=Math.PI*2,PHI=(1+Math.sqrt(5))/2;
+
+// ═══ PRIME SIEVE + RECURSIVE SEQUENCE ═══
+const SIEVE_MAX=1000;
+const sieve=new Uint8Array(SIEVE_MAX).fill(1);
+sieve[0]=sieve[1]=0;
+for(let i=2;i*i<SIEVE_MAX;i++)if(sieve[i])for(let j=i*i;j<SIEVE_MAX;j+=i)sieve[j]=0;
+const primes=[];for(let i=0;i<SIEVE_MAX;i++)if(sieve[i])primes.push(i);
+
+// a(n+1) = prime(a(n)) — the nth prime
+// a(0)=2, a(1)=prime(2)=3, a(2)=prime(3)=5, a(3)=prime(5)=11, a(4)=prime(11)=31, a(5)=prime(31)=127, a(6)=prime(127)=709
+const SEQ=[2];
+for(let i=0;i<6;i++){
+  const idx=SEQ[SEQ.length-1];
+  if(idx<primes.length)SEQ.push(primes[idx-1]);// prime(n) = nth prime (1-indexed)
+  else break;
+}
+// Fix: prime(2)=3, prime(3)=5, prime(5)=11, prime(11)=31, prime(31)=127, prime(127)=709
+// Using 1-indexed: the 2nd prime is 3, 3rd is 5, 5th is 11, 11th is 31, 31st is 127, 127th is 709
+const SEQ_FIXED=[2,3,5,11,31,127,709];
+
+// ═══ HYPERCUBE GENERATORS ═══
+function hyperVerts(n){
+  const c=Math.pow(2,n),v=[];
+  for(let i=0;i<c;i++){const p=[];for(let d=0;d<n;d++)p.push(((i>>d)&1)?1:-1);v.push(p);}
+  return v;
+}
+function hyperEdges(v,n){
+  const e=[];
+  for(let i=0;i<v.length;i++)for(let j=i+1;j<v.length;j++){
+    let d=0;for(let k=0;k<n;k++)if(v[i][k]!==v[j][k])d++;
+    if(d===1)e.push([i,j]);
+  }
+  return e;
+}
+function projectND(v,n,rots,t){
+  let p=v.slice();
+  // Apply rotations in higher-dim planes
+  for(let d=3;d<n&&d<8;d++){
+    const r=t*(0.2+d*0.07)+(d*1.1);
+    const c=Math.cos(r),s=Math.sin(r);
+    const a=Math.min(d,p.length-1),b=Math.min(0,p.length-1);
+    if(a<p.length&&b<p.length){
+      const x=p[b],w=p[a];
+      p[b]=x*c-w*s;p[a]=x*s+w*c;
+    }
+    // also rotate in another plane
+    const r2=t*(0.15+d*0.05)+(d*2.3);
+    const c2=Math.cos(r2),s2=Math.sin(r2);
+    const a2=Math.min(1,p.length-1),b2=Math.min(d,p.length-1);
+    if(a2<p.length&&b2<p.length&&a2!==b2){
+      const x2=p[a2],w2=p[b2];
+      p[a2]=x2*c2-w2*s2;p[b2]=x2*s2+w2*c2;
+    }
+  }
+  // Perspective project down to 3D
+  let x=p[0]||0,y=p[1]||0,z=p[2]||0;
+  for(let d=n-1;d>=3;d--){
+    const w=p[d]||0;
+    const dist=3+d*0.5;
+    const f=dist/(dist-w);
+    x*=f;y*=f;z*=f;
+  }
+  return[x,y,z];
+}
+
+// ═══ TETRAHEDRON from cube (pick 4 of 8 verts) ═══
+const TETRA_INDICES=[0,3,5,6]; // alternating vertices of cube
+
+// ═══ THREE.JS ═══
+let scene,camera,renderer;
+let bloomGroup,implodeGroup,primeGroup;
+let t=0,playing=false,duration=90;
+
+function init(){
+  scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(0x050810,0.015);
+  camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,0.1,500);
+  camera.position.set(0,0,12);
+  renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setClearColor(0x050810);
+  document.body.prepend(renderer.domElement);
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0x4a6480,0.3));
+  const k=new THREE.PointLight(0xd4a94a,0.6,30);k.position.set(5,5,5);scene.add(k);
+  const f=new THREE.PointLight(0x4a7290,0.4,30);f.position.set(-5,-3,4);scene.add(f);
+  const r=new THREE.PointLight(0xb8484f,0.3,30);r.position.set(0,5,-5);scene.add(r);
+
+  // Stars
+  const sg=new THREE.BufferGeometry();
+  const sp=new Float32Array(3000*3);
+  for(let i=0;i<3000;i++){
+    const r=50+Math.random()*100,th=Math.random()*TAU,ph=Math.acos(2*Math.random()-1);
+    sp[i*3]=r*Math.sin(ph)*Math.cos(th);sp[i*3+1]=r*Math.sin(ph)*Math.sin(th);sp[i*3+2]=r*Math.cos(ph);
+  }
+  sg.setAttribute('position',new THREE.BufferAttribute(sp,3));
+  scene.add(new THREE.Points(sg,new THREE.PointsMaterial({size:0.12,color:0xd8cdb4,transparent:true,opacity:0.5,blending:THREE.AdditiveBlending})));
+
+  // Groups — left=implode, right=bloom, center=prime recursion
+  implodeGroup=new THREE.Group();implodeGroup.position.x=-4;scene.add(implodeGroup);
+  bloomGroup=new THREE.Group();bloomGroup.position.x=4;scene.add(bloomGroup);
+  primeGroup=new THREE.Group();scene.add(primeGroup);
+
+  // Divider line
+  const dg=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,-20,0),new THREE.Vector3(0,20,0)]);
+  scene.add(new THREE.Line(dg,new THREE.LineBasicMaterial({color:0xd4a94a,transparent:true,opacity:0.15})));
+
+  setupControls();
+  window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+}
+
+// ═══ BUILD GEOMETRIES ═══
+function makeWireframe(verts3,edges,color,opacity=0.7,thick=0.012){
+  const g=new THREE.Group();
+  // Edges as lines
+  const lg=new THREE.BufferGeometry();
+  const pos=new Float32Array(edges.length*6);
+  edges.forEach(([a,b],i)=>{
+    pos[i*6]=verts3[a][0];pos[i*6+1]=verts3[a][1];pos[i*6+2]=verts3[a][2];
+    pos[i*6+3]=verts3[b][0];pos[i*6+4]=verts3[b][1];pos[i*6+5]=verts3[b][2];
+  });
+  lg.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  g.add(new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color,transparent:true,opacity})));
+  // Vertex spheres
+  verts3.forEach(v=>{
+    const s=new THREE.Mesh(new THREE.SphereGeometry(0.06,12,12),new THREE.MeshPhongMaterial({color,emissive:color,emissiveIntensity:0.8}));
+    s.position.set(...v);g.add(s);
+  });
+  g.userData={lineGeo:lg,verts3,edges};
+  return g;
+}
+
+function updateWireframe(g,verts3){
+  const lg=g.userData.lineGeo;
+  const pos=lg.attributes.position;
+  const edges=g.userData.edges;
+  edges.forEach(([a,b],i)=>{
+    pos.array[i*6]=verts3[a][0];pos.array[i*6+1]=verts3[a][1];pos.array[i*6+2]=verts3[a][2];
+    pos.array[i*6+3]=verts3[b][0];pos.array[i*6+4]=verts3[b][1];pos.array[i*6+5]=verts3[b][2];
+  });
+  pos.needsUpdate=true;
+  let si=0;
+  g.children.forEach(c=>{if(c.isMesh){c.position.set(...verts3[si]);si++;}});
+}
+
+// ═══ PHASE TIMELINE ═══
+const PHASES=[
+  {t:0, name:'the cube',         explain:'a(0) = 2 · the seed · both sides begin equal'},
+  {t:12,name:'the choice',       explain:'a(1) = 3 · one side opens · one side collapses'},
+  {t:25,name:'divergence',       explain:'a(2) = 5 · the bloom gains dimension · the implode loses it'},
+  {t:38,name:'the tesseract',    explain:'a(3) = 11 · 4D rotation projected to 3D'},
+  {t:50,name:'penteract',        explain:'a(4) = 31 · 5D · 32 vertices blooming'},
+  {t:62,name:'mersenne',         explain:'a(5) = 127 = M₇ · the shield prime · 6D sexeract'},
+  {t:75,name:'the 709th prime',  explain:'a(6) = 709 · the recursion reaches the unreachable'},
+  {t:85,name:'the wake',         explain:'look behind the arrow · count the petals'},
+];
+
+function getPhase(time){
+  let p=0;for(let i=0;i<PHASES.length;i++)if(time>=PHASES[i].t)p=i;
+  return PHASES[p];
+}
+
+// ═══ ANIMATION STATE ═══
+let implodeMesh=null,bloomMesh=null;
+let primeRings=[];
+let particles=[];
+
+function emitParticles(pos,count,color,speed=1.5){
+  for(let i=0;i<count;i++){
+    const p=new THREE.Mesh(new THREE.SphereGeometry(0.025,6,6),new THREE.MeshBasicMaterial({color,transparent:true,opacity:1}));
+    const a1=Math.random()*TAU,a2=Math.random()*Math.PI;
+    const s=speed*(0.5+Math.random()*0.8);
+    p.position.copy(pos);
+    p.userData={vel:new THREE.Vector3(Math.sin(a2)*Math.cos(a1)*s,Math.sin(a2)*Math.sin(a1)*s,Math.cos(a2)*s),life:1500+Math.random()*1500,maxLife:2000};
+    scene.add(p);particles.push(p);
+  }
+}
+
+function updateParticles(dt){
+  for(let i=particles.length-1;i>=0;i--){
+    const p=particles[i];p.userData.life-=dt*1000;
+    if(p.userData.life<=0){scene.remove(p);p.geometry.dispose();p.material.dispose();particles.splice(i,1);continue;}
+    p.position.add(p.userData.vel.clone().multiplyScalar(dt));
+    p.userData.vel.multiplyScalar(0.97);
+    p.material.opacity=p.userData.life/p.userData.maxLife;
+  }
+}
+
+const fired=new Set();
+function once(k,fn){if(!fired.has(k)){fired.add(k);fn();}}
+
+// ═══ PRIME RECURSIVE RINGS ═══
+function buildPrimeRing(depth,radius,color,segments){
+  const g=new THREE.Group();
+  // Torus ring
+  const torus=new THREE.Mesh(
+    new THREE.TorusGeometry(radius,0.008,8,96),
+    new THREE.MeshPhongMaterial({color,emissive:color,emissiveIntensity:0.4,transparent:true,opacity:0.6})
+  );
+  g.add(torus);
+  // Prime vertex nodes
+  for(let i=0;i<segments;i++){
+    const angle=(i/segments)*TAU;
+    const s=new THREE.Mesh(new THREE.SphereGeometry(0.04,8,8),new THREE.MeshPhongMaterial({color,emissive:color,emissiveIntensity:0.9}));
+    s.position.set(Math.cos(angle)*radius,Math.sin(angle)*radius,0);
+    g.add(s);
+  }
+  // Tilt at golden angle * depth
+  g.rotation.x=depth*Math.PI*PHI;
+  g.rotation.y=depth*TAU/7;
+  g.userData={depth,radius,segments,torus};
+  return g;
+}
+
+// ═══ MAIN UPDATE ═══
+function update(time){
+  const phase=getPhase(time);
+  // Phase label
+  document.getElementById('ph-num').textContent='PHASE '+PHASES.indexOf(phase);
+  document.getElementById('ph-name').textContent=phase.name;
+  document.getElementById('phase').classList.toggle('show',true);
+
+  // Sequence display
+  const seqIdx=Math.min(Math.floor(time/13),SEQ_FIXED.length-1);
+  const chain=SEQ_FIXED.slice(0,seqIdx+1).map((v,i)=>`a(${i})=${v}`).join(' → ');
+  document.getElementById('seq-chain').textContent=chain;
+  document.getElementById('seq-explain').textContent=phase.explain;
+
+  // Show labels after phase 1
+  document.getElementById('lbl-implode').classList.toggle('show',time>12);
+  document.getElementById('lbl-bloom').classList.toggle('show',time>12);
+
+  // ─── IMPLODE SIDE (LEFT) ───
+  // Progress from cube(8v) to tetrahedron(4v)
+  const implodeProgress=Math.min(1,Math.max(0,(time-12)/15));
+
+  // Cube vertices
+  const cubeV=hyperVerts(3);
+  const cubeE=hyperEdges(cubeV,3);
+
+  // Interpolate: cube verts → tetra verts (4 survive, 4 collapse to center)
+  const implodeVerts=cubeV.map((v,i)=>{
+    const isTetra=TETRA_INDICES.includes(i);
+    const target=isTetra?v:[0,0,0];
+    return v.map((c,d)=>c*(1-implodeProgress)+target[d]*implodeProgress);
+  });
+
+  // Remove edges to dead verts at high progress
+  let implodeEdges=cubeE;
+  if(implodeProgress>0.8){
+    const alive=new Set(TETRA_INDICES);
+    implodeEdges=cubeE.filter(([a,b])=>alive.has(a)&&alive.has(b));
+  }
+
+  // Rebuild implode mesh
+  implodeGroup.clear();
+  const iv3=implodeVerts.map(v=>[v[0]*1.2,v[1]*1.2,v[2]*1.2]);
+  const ig=makeWireframe(iv3,implodeEdges,0xb8484f,0.7-implodeProgress*0.3);
+  implodeGroup.add(ig);
+  implodeGroup.rotation.y=time*0.15;
+  implodeGroup.rotation.x=Math.sin(time*0.1)*0.2;
+
+  // Collapse glow at center when imploding
+  if(implodeProgress>0.3&&implodeProgress<0.95){
+    once('implode_burst',()=>emitParticles(new THREE.Vector3(-4,0,0),40,0xb8484f,1));
+  }
+
+  // Ghost of lost vertices
+  if(implodeProgress>0.5){
+    const ghostOpacity=(1-implodeProgress)*0.5;
+    cubeV.forEach((v,i)=>{
+      if(!TETRA_INDICES.includes(i)){
+        const gm=new THREE.Mesh(new THREE.SphereGeometry(0.04,8,8),new THREE.MeshBasicMaterial({color:0xb8484f,transparent:true,opacity:ghostOpacity}));
+        gm.position.set(v[0]*1.2,v[1]*1.2,v[2]*1.2);
+        implodeGroup.add(gm);
+      }
+    });
+  }
+
+  const implodeVertCount=implodeProgress>0.8?4:8;
+  document.getElementById('m-iv').textContent=implodeVertCount;
+
+  // ─── BLOOM SIDE (RIGHT) ───
+  const bloomDim=time<12?3:time<25?3:time<38?4:time<50?5:time<62?6:time<75?7:7;
+  const bloomProgress=Math.min(1,(time-12)/8);
+
+  bloomGroup.clear();
+
+  if(bloomDim<=7){
+    const bv=hyperVerts(Math.min(bloomDim,7));
+    const be=hyperEdges(bv,Math.min(bloomDim,7));
+    const bv3=bv.map(v=>projectND(v,Math.min(bloomDim,7),[],time).map(c=>c*1.1));
+    const colors=[0x88a884,0x88a884,0x6090b0,0x8c72b8,0xd4a94a,0xf0e6d0,0xd4a94a];
+    const bg=makeWireframe(bv3,be,colors[Math.min(bloomDim-1,6)],0.6);
+    bloomGroup.add(bg);
+
+    // Inner glow for higher dimensions
+    if(bloomDim>=4){
+      const innerV=hyperVerts(3);
+      const innerE=hyperEdges(innerV,3);
+      const iv=innerV.map(v=>[v[0]*0.5,v[1]*0.5,v[2]*0.5]);
+      const innerG=makeWireframe(iv,innerE,0xd4a94a,0.2);
+      bloomGroup.add(innerG);
+    }
+  }
+
+  bloomGroup.rotation.y=time*0.12;
+  bloomGroup.rotation.x=Math.sin(time*0.08)*0.15;
+
+  const bloomVertCount=Math.pow(2,Math.min(bloomDim,7));
+  document.getElementById('m-bv').textContent=bloomVertCount;
+  document.getElementById('m-dim').textContent=bloomDim+'D';
+  document.getElementById('m-prime').textContent=SEQ_FIXED[Math.min(seqIdx,6)];
+
+  // Bloom bursts at dimension changes
+  [12,25,38,50,62,75].forEach((tt,i)=>{
+    once('bloom_'+i,()=>{if(time>tt)emitParticles(new THREE.Vector3(4,0,0),30+i*10,0x88a884,2);});
+  });
+
+  // ─── CENTER: PRIME RECURSIVE RINGS ───
+  primeGroup.clear();
+
+  const ringCount=Math.min(seqIdx+1,7);
+  const ringColors=[0xc44536,0xd4a07a,0xd4c447,0x7eb88a,0x4a9bc4,0xb388ff,0xd4a94a];
+
+  for(let i=0;i<ringCount;i++){
+    const radius=0.3+i*0.25;
+    const segments=SEQ_FIXED[i];
+    const actualSegs=Math.min(segments,64);// cap visual segments
+    const ring=buildPrimeRing(i,radius,ringColors[i],actualSegs);
+
+    // Animate ring rotation
+    ring.rotation.z=time*(0.1+i*0.03)*(i%2===0?1:-1);
+
+    // Fade in
+    const fadeStart=i*13;
+    const alpha=Math.min(1,Math.max(0,(time-fadeStart)/3));
+    ring.children.forEach(c=>{if(c.material)c.material.opacity=alpha*0.6;});
+
+    // Recursive nesting: at depth 5 (127), draw inner recursive pattern
+    if(i>=5&&time>62){
+      for(let j=0;j<7;j++){
+        const subR=radius*0.3;
+        const subAngle=(j/7)*TAU+time*0.2;
+        const subRing=new THREE.Mesh(
+          new THREE.TorusGeometry(subR,0.004,6,48),
+          new THREE.MeshPhongMaterial({color:ringColors[j],emissive:ringColors[j],emissiveIntensity:0.3,transparent:true,opacity:0.3})
+        );
+        subRing.position.set(Math.cos(subAngle)*radius,Math.sin(subAngle)*radius,0);
+        subRing.rotation.x=j*PHI;
+        subRing.rotation.y=time*0.3+j;
+        ring.add(subRing);
+
+        // Sub-sub recursion at depth 6 (709)
+        if(i>=6&&time>75){
+          for(let k=0;k<3;k++){
+            const ssR=subR*0.3;
+            const ssAngle=(k/3)*TAU+time*0.4;
+            const ss=new THREE.Mesh(
+              new THREE.TorusGeometry(ssR,0.002,4,24),
+              new THREE.MeshPhongMaterial({color:0xd4a94a,emissive:0xd4a94a,emissiveIntensity:0.5,transparent:true,opacity:0.2})
+            );
+            ss.position.set(Math.cos(ssAngle)*subR,Math.sin(ssAngle)*subR,0);
+            ss.rotation.x=k*PHI*2;
+            subRing.add(ss);
+          }
+        }
+      }
+    }
+
+    primeGroup.add(ring);
+  }
+
+  // Core icosahedron
+  if(time>5){
+    const coreAlpha=Math.min(0.4,time*0.01);
+    const core=new THREE.Mesh(
+      new THREE.IcosahedronGeometry(0.15,1),
+      new THREE.MeshPhongMaterial({color:0xd4a94a,emissive:0xd4a94a,emissiveIntensity:0.7,transparent:true,opacity:coreAlpha,wireframe:true})
+    );
+    core.rotation.x=time*0.3;core.rotation.y=time*0.4;
+    primeGroup.add(core);
+
+    // Corona
+    if(time>62){
+      const corona=new THREE.Mesh(
+        new THREE.SphereGeometry(0.4+Math.sin(time*2)*0.05,16,16),
+        new THREE.MeshBasicMaterial({color:0xd4a94a,transparent:true,opacity:0.08,blending:THREE.AdditiveBlending})
+      );
+      primeGroup.add(corona);
+    }
+  }
+
+  primeGroup.rotation.y=time*0.05;
+
+  // ─── CAMERA ───
+  cam.theta+=0.001;
+  camera.position.x=Math.sin(cam.theta)*Math.cos(cam.phi)*cam.r;
+  camera.position.y=Math.sin(cam.phi)*cam.r;
+  camera.position.z=Math.cos(cam.theta)*Math.cos(cam.phi)*cam.r;
+  camera.lookAt(0,0,0);
+}
+
+// ═══ CAMERA CONTROLS ═══
+const cam={theta:0,phi:0.15,r:12};
+function setupControls(){
+  let drag=false,px=0,py=0;
+  const c=renderer.domElement;
+  c.addEventListener('mousedown',e=>{drag=true;px=e.clientX;py=e.clientY});
+  window.addEventListener('mouseup',()=>drag=false);
+  window.addEventListener('mousemove',e=>{
+    if(!drag)return;
+    cam.theta-=(e.clientX-px)*0.004;
+    cam.phi+=(e.clientY-py)*0.004;
+    cam.phi=Math.max(-0.7,Math.min(0.7,cam.phi));
+    px=e.clientX;py=e.clientY;
+  });
+  c.addEventListener('wheel',e=>{cam.r=Math.max(4,Math.min(25,cam.r+e.deltaY*0.005))},{passive:true});
+  c.addEventListener('touchstart',e=>{drag=true;px=e.touches[0].clientX;py=e.touches[0].clientY},{passive:true});
+  window.addEventListener('touchend',()=>drag=false);
+  window.addEventListener('touchmove',e=>{
+    if(!drag||!e.touches[0])return;
+    cam.theta-=(e.touches[0].clientX-px)*0.004;
+    cam.phi+=(e.touches[0].clientY-py)*0.004;
+    cam.phi=Math.max(-0.7,Math.min(0.7,cam.phi));
+    px=e.touches[0].clientX;py=e.touches[0].clientY;
+  },{passive:true});
+}
+
+// ═══ RECORDING ═══
+let mediaRec=null,chunks=[];
+document.getElementById('rec').onclick=()=>{
+  if(!mediaRec||mediaRec.state==='inactive'){
+    const stream=renderer.domElement.captureStream(30);
+    const types=['video/mp4;codecs=avc1.42E01E','video/mp4','video/webm;codecs=vp9','video/webm'];
+    let mime='';for(const c of types)if(MediaRecorder.isTypeSupported(c)){mime=c;break;}
+    if(!mime){toast('no recording support');return;}
+    mediaRec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:8000000});
+    chunks=[];
+    mediaRec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data)};
+    mediaRec.onstop=()=>{
+      const blob=new Blob(chunks,{type:mime});
+      const url=URL.createObjectURL(blob);
+      const ext=mime.includes('mp4')?'mp4':'webm';
+      const dl=document.getElementById('dl');
+      const link=document.getElementById('dl-link');
+      link.href=url;link.download=`bloom-vs-implode-${Date.now()}.${ext}`;
+      link.textContent=`↓ ${ext.toUpperCase()} · ${(blob.size/1024/1024).toFixed(1)}MB`;
+      dl.classList.add('show');
+    };
+    mediaRec.start();
+    document.getElementById('rec').textContent='⏹ STOP';
+    document.getElementById('rec').classList.add('rec');
+    t=0;playing=true;fired.clear();particles.forEach(p=>{scene.remove(p)});particles=[];
+    document.getElementById('play').textContent='❚❚';
+    toast('recording');
+  }else{
+    mediaRec.stop();playing=false;
+    document.getElementById('rec').textContent='⏺ RECORD';
+    document.getElementById('rec').classList.remove('rec');
+    document.getElementById('play').textContent='▶ PLAY';
+  }
+};
+
+// ═══ PLAYBACK ═══
+document.getElementById('play').onclick=()=>{
+  playing=!playing;
+  document.getElementById('play').textContent=playing?'❚❚':'▶ PLAY';
+};
+document.getElementById('restart').onclick=()=>{
+  t=0;fired.clear();particles.forEach(p=>{scene.remove(p)});particles=[];
+};
+
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+function fmtTime(s){return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0')}
+
+// ═══ LOOP ═══
+let lastFrame=0;
+function animate(ts){
+  requestAnimationFrame(animate);
+  if(!lastFrame)lastFrame=ts;
+  const dt=Math.min(0.05,(ts-lastFrame)/1000);
+  lastFrame=ts;
+
+  if(playing){
+    t+=dt;
+    if(t>=duration){t=duration;playing=false;document.getElementById('play').textContent='▶ PLAY';
+      if(mediaRec&&mediaRec.state==='recording')mediaRec.stop();
+    }
+  }
+
+  update(t);
+  updateParticles(dt);
+  document.getElementById('time').textContent=fmtTime(t)+' / '+fmtTime(duration);
+  renderer.render(scene,camera);
+}
+
+init();
+animate(0);
+</script>
+</body>
+</html>
